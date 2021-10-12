@@ -12,7 +12,7 @@ namespace Neac.DataAccess
 {
     public class NeacDbContext : DbContext
     {
-        public static readonly string ConnectionString = "Server=123.25.26.130,26882;Database=CoreDb;User Id=sa;Password=1Qaz2wsx;";
+        public static readonly string ConnectionString = "Server=123.25.26.130,26882;Database=ProjectBiddingPackage;User Id=sa;Password=1Qaz2wsx;";
         public NeacDbContext(DbContextOptions<NeacDbContext> options) : base(options)
         {
         }
@@ -20,6 +20,9 @@ namespace Neac.DataAccess
         public DbSet<MeetRoom> MeetRooms { get; set; }
         public DbSet<UserPosition> UserPositions { get; set; }
         public DbSet<GroupRole> GroupRoles { get; set; }
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<BiddingPackage> BiddingPackages { get; set; }
+        public DbSet<BiddingPackageProject> BiddingPackageProjects { get; set; }
     }
     public class NeacDbContextFactory : IDesignTimeDbContextFactory<NeacDbContext>
     {

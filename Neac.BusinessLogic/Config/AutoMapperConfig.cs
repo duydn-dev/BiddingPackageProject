@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Neac.Common.Dtos;
 using Neac.Common.Dtos.PositionDtos;
+using Neac.Common.Dtos.ProjectDtos;
 using Neac.DataAccess;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,12 @@ namespace Neac.BusinessLogic.Config
 
             CreateMap<UserPosition, PositonGetDropdownViewDto>();
             CreateMap<PositonGetDropdownViewDto, UserPosition>().ForMember(x => x.Users, g => g.Ignore());
-            
+
+
+            CreateMap<Project, ProjectGetListDto>()
+                .ForMember(dest => dest.BiddingPackageProjects, opt => opt.MapFrom(src => src.BiddingPackageProjects))
+                ;
+            CreateMap<ProjectGetListDto, Project>();
         }
     }
 }
