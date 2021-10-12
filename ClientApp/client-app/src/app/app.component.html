@@ -1,0 +1,10 @@
+<app-menu-top *ngIf="isLogin && isNotFound"></app-menu-top>
+<app-menu-left *ngIf="isLogin && isNotFound"></app-menu-left>
+<main class="mdl-layout__content" [style]="(isLogin && isNotFound) ? 'width: calc(100% - 236px); float: right;overflow-y: auto;height: 800px;': ''">
+    <div class="dashboard">
+        <div class="">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</main>
+<p-toast position="bottom-right"></p-toast>

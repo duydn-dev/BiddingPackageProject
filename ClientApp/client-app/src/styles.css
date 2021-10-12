@@ -1,0 +1,16 @@
+@font-face {
+    font-family: sarabun;
+    src: url(./assets/fonts/Sarabun-Medium.ttf);
+  }
+html, body{
+    font-family: sarabun;
+}
+.p-paginator{
+  background-color: #3a3a3a;
+}
+.mr-20{
+  margin-right: 20px;
+}
+.mr-10{
+  margin-right: 10px;
+}

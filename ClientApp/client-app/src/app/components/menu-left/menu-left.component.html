@@ -1,0 +1,41 @@
+<div class="mdl-layout__drawer">
+    <header>
+        <strong>darkboard</strong>
+        <button type="button" class="btn-menubar"><i class="fas fa-bars"></i></button>
+    </header>
+    <div class="scroll__wrapper" id="scroll__wrapper">
+        <div class="scroller" id="scroller">
+            <div class="scroll__container" id="scroll__container">
+                <nav class="mdl-navigation">
+                    <div class="sub-navigation" *ngFor="let menu1 of menuData">
+                        <div class="sub-navigation-item">
+                            <a class="mdl-navigation__link" (click)="menuClick($event)" [routerLink]="menu1.childs?.length > 0 ? menu1.link : ''">
+                                <i class="material-icons">{{menu1.icon}}</i>
+                                {{menu1.name}}
+                                <i class="material-icons" *ngIf="menu1.childs?.length > 0">keyboard_arrow_down</i>
+                            </a>
+                            <div class="mdl-navigation">
+                                <div *ngIf="menu1.childs?.length > 0" class="sub-navigation">
+                                    <div class="sub-navigation-item" *ngFor="let menu2 of menu1.childs">
+                                        <a class="mdl-navigation__link" (click)="menuClick($event)" [routerLink]="menu2.link">
+                                            {{menu2.name}}
+                                            <i class="material-icons"
+                                                *ngIf="menu2.childs?.length > 0">keyboard_arrow_down</i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mdl-layout-spacer"></div>
+                    <hr>
+                    <a class="mdl-navigation__link" href="https://o2tech.vn/" target="_blank">
+                        <i class="material-icons" role="presentation">link</i>
+                        O2 TECH
+                    </a>
+                </nav>
+            </div>
+        </div>
+        <div class='scroller__bar' id="scroller__bar"></div>
+    </div>
+</div>

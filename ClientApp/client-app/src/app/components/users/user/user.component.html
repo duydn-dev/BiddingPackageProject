@@ -1,0 +1,165 @@
+
+<div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
+    <div class="mdl-card mdl-shadow--2dp line-chart">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Quản lý người dùng</h2>
+        </div>
+        <div class="mdl-card__supporting-text w-100">
+            <div class="w-100">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable float-start">
+                    <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+                        <i class="material-icons">search</i>
+                    </label>
+    
+                    <div class="mdl-textfield__expandable-holder">
+                        <input class="mdl-textfield__input" type="text" id="search" (keyup.enter)="searchData()" [(ngModel)]="search.textSearch"/>
+                        <label class="mdl-textfield__label" for="search">Tìm kiếm...</label>
+                    </div>
+                </div>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end" (click)="openEditForm()">
+                    <i class="material-icons">add_circle</i>
+                    Thêm mới
+                </button>
+            </div>
+            <table class="mdl-data-table mdl-js-data-table bordered-table w-100">
+                <thead>
+                <tr>
+                    <th class="mdl-data-table__cell--non-numeric">STT</th>
+                    <th class="mdl-data-table__cell--non-numeric">Tên</th>
+                    <th class="mdl-data-table__cell--non-numeric">Địa chỉ</th>
+                    <th class="mdl-data-table__cell--non-numeric">Email</th>
+                    <th class="mdl-data-table__cell--non-numeric">SDT</th>
+                    <th class="mdl-data-table__cell--non-numeric">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let item of users; let i = index">
+                    <td class="mdl-data-table__cell--non-numeric">{{i + 1}}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{item.userName}}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{item.address}}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{item.email}}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{item.numberPhone}}</td>
+                    <td class="mdl-data-table__cell--non-numeric">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openEditForm(item.userId)">
+                            <i class="material-icons">create</i>
+                            Sửa
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red" (click)="openDeleteForm(item.userId)">
+                            <i class="material-icons">delete</i>
+                            Xóa
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <p-paginator [rows]="search.pageSize" [totalRecords]="totalData" (onPageChange)="onPageChange($event)"></p-paginator>
+        </div>
+    </div>
+</div>
+
+<!-- Create, Edit dialog -->
+<p-dialog [header]="userId ? 'Chỉnh sửa người dùng' : 'Thêm mới người dùng'" [(visible)]="isShowModal" [modal]="true" [style]="{width: '50vw'}"
+    [draggable]="false" [resizable]="false">
+    <form [formGroup]="userForm">
+        <div class="form-group">
+            <label class="col-lg-12">Tên tài khoản</label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="userName" placeholder="Tên tài khoản..." class="w-100"/>
+                <div class="error pl-0" *ngIf="(form.userName.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.userName.errors?.required">Tên tài khoản không thể để trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Họ tên</label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="fullName" placeholder="Họ tên..." class="w-100"/>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Email</label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="email" placeholder="Email..." class="w-100"/>
+                <div class="error pl-0" *ngIf="(form.email.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.email.errors?.required">Email không thể để trống</p>
+                    <p class="text-danger" *ngIf="form.email.errors?.email">Email không đúng định dạng</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Số điện thoại</label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="numberPhone" placeholder="Số điện thoại..." class="w-100"/>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Địa chỉ</label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="address" placeholder="Địa chỉ..." class="w-100"/>
+            </div>
+        </div>
+        <div class="form-group mt-2" *ngIf="!userId">
+            <label class="col-lg-12">Mật khẩu</label>
+            <div class="col-lg-12">
+                <input type="password" pInputText formControlName="passWord" placeholder="Mật khẩu..." class="w-100"/>
+                <div class="error pl-0" *ngIf="(form.passWord.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.passWord.errors?.required">Mật khẩu không thể để trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Trạng thái</label>
+            <div class="col-lg-12">
+                <p-dropdown 
+                    [options]="userStatus" 
+                    optionLabel="name" 
+                    optionValue="status" 
+                    formControlName="status" 
+                    placeholder="Trạng thái..."
+                    [styleClass]="'w-100'"
+                    >
+                </p-dropdown>
+                <div class="error pl-0" *ngIf="(form.status.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.status.errors?.required">Trạng thái không thể để trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Ảnh đại diện</label>
+            <div class="col-lg-12">
+                <p-fileUpload #fubauto mode="basic" name="avatar[]" [customUpload]="true" accept="image/*" maxFileSize="1000000" (onSelect)="onUploadAvatar($event)" chooseLabel="Upload"></p-fileUpload>
+                <img [src]="previewAvatar ? fullAvatarPath : '/assets/images/no-image.jpg'" class="rounded float-start mt-3" width="200" height="200" style="object-fit: cover;">
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12">Nhóm tài khoản</label>
+            <div class="col-lg-12">
+                <p-dropdown 
+                    [options]="positions" 
+                    optionLabel="userPositionName" 
+                    optionValue="userPositionId" 
+                    formControlName="userPositionId" 
+                    placeholder="Nhóm tài khoản..."
+                    [styleClass]="'w-100'"
+                    >
+                </p-dropdown>
+                <div class="error pl-0" *ngIf="(form.userPositionId.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.userPositionId.errors?.required">Nhóm tài khoản không thể để trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group float-end pt-3 pb-3">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue mr-10" title="Lưu" (click)="save()">
+                <i class="material-icons">check</i>
+                Lưu
+            </button>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-dark" title="Đóng" (click)="isShowModal=false">
+                <i class="material-icons">close</i>
+                Đóng
+            </button>
+        </div>
+    </form>
+</p-dialog>
+
+<!-- Delete dialog -->
+<p-confirmDialog header="" icon="pi pi-exclamation-triangle"></p-confirmDialog>

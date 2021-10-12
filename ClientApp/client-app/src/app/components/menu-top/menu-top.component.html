@@ -1,0 +1,27 @@
+<header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+        <div class="mdl-layout-spacer"></div>
+        <div class="box-profile">
+            <button id="btn-profile">
+                <span>{{currentUser.fullName}}</span>
+                <img src="./assets/images/149071.png" class="img-avatar" width="40" height="40">
+            </button>
+            <div class="menu-child-profile">
+                <ul class="lst-mndepth">
+                    <li>
+                        <a href="#none"><i class="fas fa-user text-color--secondary"></i> &ensp; Trang cá nhân</a>
+                    </li>
+                    <li (click)="logout()">
+                        <a href="#none"><i class="fas fa-sign-out-alt text-color--secondary"></i> &ensp; Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect mdl-shadow--2dp settings-dropdown"
+                for="more">
+                <li class="mdl-menu__item" (click)="logout()">
+                    <span><i class="fas fa-sign-out-alt text-color--secondary"></i> &ensp; Log out</span>
+                </li>
+        </ul> -->
+    </div>
+</header>
