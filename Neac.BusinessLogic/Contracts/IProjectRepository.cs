@@ -11,5 +11,9 @@ namespace Neac.BusinessLogic.Contracts
     public interface IProjectRepository
     {
         Task<Response<GetListResponseModel<List<ProjectGetListDto>>>> GetFilter(string filter);
+        Task<Response<ProjectGetListDto>> GetByIdAsync(Guid projectId);
+        Task<Response<ProjectGetListDto>> CreateAsync(ProjectGetListDto request);
+        Task<Response<ProjectGetListDto>> UpdateAsync(ProjectGetListDto request);
+        Task<Response<bool>> DeleteAsync(Guid projectId);
     }
 }

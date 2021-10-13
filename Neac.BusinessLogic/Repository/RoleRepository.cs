@@ -80,7 +80,7 @@ namespace Neac.BusinessLogic.Repository
                         role.RoleId = Guid.NewGuid();
                         role.CreatedBy = currentUser.UserId;
                         role.CreatedDate = DateTime.Now;
-                        roleCode.GroupRoleId = await GetGroupRoleId(role.RoleCode, listGroupRole);
+                        role.GroupRoleId = await GetGroupRoleId(role.RoleCode, listGroupRole);
                         await _unitOfWork.GetRepository<Role>().Add(role);
                     }
                 }

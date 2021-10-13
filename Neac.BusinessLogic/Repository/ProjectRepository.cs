@@ -4,6 +4,7 @@ using Neac.BusinessLogic.Contracts;
 using Neac.BusinessLogic.UnitOfWork;
 using Neac.Common;
 using Neac.Common.Dtos;
+using Neac.Common.Dtos.BiddingPackage;
 using Neac.Common.Dtos.ProjectDtos;
 using Neac.DataAccess;
 using Newtonsoft.Json;
@@ -55,9 +56,21 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
-                var data = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectId)
-                    .Include(n => n.BiddingPackageProjects).FirstOrDefaultAsync();
-                return Response<ProjectGetListDto>.CreateSuccessResponse(_mapper.Map<Project, ProjectGetListDto>(data));
+                var query = await _unitOfWork.GetRepository<Project>().GetAll()
+                    .Include(n => n.BiddingPackageProjects)
+                    .ThenInclude(n => n.BiddingPackage)
+                    .Where(n => n.ProjectId == projectId)
+                    .FirstOrDefaultAsync();
+
+                var biddingPackages = query.BiddingPackageProjects.Select(n => n.BiddingPackage).OrderByDescending(n => n.Order).ToList();
+                var mapped = _mapper.Map<List<BiddingPackage>, List<BiddingPackageDto>>(biddingPackages);
+
+                var response = _mapper.Map<ProjectGetListDto>(query);
+                response.BiddingPackageDtos = mapped;
+
+                //var data = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectId)
+                //    .Include(n => n.BiddingPackageProjects).FirstOrDefaultAsync();
+                return Response<ProjectGetListDto>.CreateSuccessResponse(response);
             }
             catch (Exception ex)
             {
@@ -69,6 +82,19 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                request.ProjectId = Guid.NewGuid();
+                if (request?.BiddingPackageDtos.Count > 0)
+                {
+                    request?.BiddingPackageDtos.ForEach(async n =>
+                    {
+                        await _unitOfWork.GetRepository<BiddingPackageProject>().Add(new BiddingPackageProject
+                        {
+                            BiddingPackageProjectId = Guid.NewGuid(),
+                            ProjectId = request.ProjectId,
+                            BiddingPackageId = n.BiddingPackageId
+                        });
+                    });
+                }
                 var mappped = _mapper.Map<ProjectGetListDto, Project>(request);
                 await _unitOfWork.GetRepository<Project>().Add(mappped);
                 await _unitOfWork.SaveAsync();

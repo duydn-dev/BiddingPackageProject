@@ -1,4 +1,5 @@
-﻿using Neac.DataAccess;
+﻿using Neac.Common.Dtos.BiddingPackage;
+using Neac.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,18 +15,11 @@ namespace Neac.Common.Dtos.ProjectDtos
         public DateTime? ProjectDate { get; set; }
         public string Note { get; set; }
         public int? CurrentState { get; set; }
+        public List<BiddingPackageDto> BiddingPackageDtos {get;set; }
 
-        public List<BiddingPackageProject> BiddingPackageProjects { get; set; }
-    }
-
-    public class ProjectGetListResponse
-    {
-        public Guid? ProjectId { get; set; }
-        public string ProjectName { get; set; }
-        public DateTime? ProjectDate { get; set; }
-        public string Note { get; set; }
-        public int? CurrentState { get; set; }
-
-        public List<BiddingPackageProject> BiddingPackageProjects { get; set; }
+        public ProjectGetListDto()
+        {
+            BiddingPackageDtos = new List<BiddingPackageDto>();
+        }
     }
 }

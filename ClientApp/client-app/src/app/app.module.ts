@@ -29,6 +29,7 @@ import { TokenInterceptor } from './interceptors/token.interceptor';
 import { MenuLeftComponent } from './components/menu-left/menu-left.component';
 import { MenuTopComponent } from './components/menu-top/menu-top.component';
 import { UserComponent } from './components/users/user/user.component';
+import { ProjectComponent } from './components/project/project.component';
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import { UserComponent } from './components/users/user/user.component';
     MenuLeftComponent,
     MenuTopComponent,
     UserComponent,
+    ProjectComponent,
   ],
   imports: [
     BrowserModule,

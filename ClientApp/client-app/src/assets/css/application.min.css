@@ -7888,7 +7888,7 @@ a {
 }
 
 .mdl-data-table.bordered-table td, .mdl-data-table.bordered-table th {
-    border-right: 1px solid #606060
+    border: 1px solid #606060
 }
 
 .mdl-data-table.bordered-table tr :last-child {

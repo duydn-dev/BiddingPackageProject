@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Neac.Api.Attributes;
 using Neac.BusinessLogic.Contracts;
 using Neac.Common.Dtos;
 using Neac.Common.Dtos.MeetRooms;
@@ -15,6 +16,7 @@ namespace Neac.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [RoleGroupDescription("Quản lý nhóm tài khoản")]
     public class MeetRoomController : ControllerBase
     {
         private readonly IMeetRoomRepository _meetRoomRepository;

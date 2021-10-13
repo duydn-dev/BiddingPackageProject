@@ -17,6 +17,7 @@ namespace Neac.Api.Controllers
     [UserAuthorize]
     [Route("api/[controller]")]
     [ApiController]
+    [RoleGroupDescription("Quản lý tài khoản")]
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;

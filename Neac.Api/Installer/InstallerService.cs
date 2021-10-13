@@ -61,6 +61,7 @@ namespace Neac.Api.Installer
             services.AddTransient<IMeetRoomRepository, MeetRoomRepository>();
             services.AddTransient<IPositionRepository, PositionRepository>();
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IBiddingPackageRepository, BiddingPackageRepository>();
             // add user-defined service
         }
     }

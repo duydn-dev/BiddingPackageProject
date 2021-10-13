@@ -26,7 +26,7 @@ export class AppComponent {
     this.store.subscribe(n => {
       this.removeKeyNull();
       this.isLogin = n.user?.isLogin;
-      this.isNotFound = !(n.user.isNotFound);
+      this.isNotFound = !(n.user?.isNotFound);
       this.cdRef.detectChanges();
     })
   }

@@ -15,6 +15,7 @@ namespace Neac.Api.Controllers
     [UserAuthorize]
     [Route("api/[controller]")]
     [ApiController]
+    [RoleGroupDescription("Quản lý nhóm tài khoản")]
     public class PositionController : ControllerBase
     {
         private readonly IPositionRepository _positionRepository;
