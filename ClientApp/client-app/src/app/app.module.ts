@@ -13,13 +13,14 @@ import {metaReducers, reducers} from '../app/ngrx/index';
 // primNG module
 import {ToastModule} from 'primeng/toast';
 import {TableModule} from 'primeng/table';
-import {MessageService, ConfirmationService} from 'primeng/api';
+import {MessageService, ConfirmationService, TreeNode} from 'primeng/api';
 import {PaginatorModule} from 'primeng/paginator';
 import {DialogModule} from 'primeng/dialog';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {InputTextModule} from 'primeng/inputtext';
 import {DropdownModule} from 'primeng/dropdown';
 import {FileUploadModule} from 'primeng/fileupload';
+import {TreeModule} from 'primeng/tree';
 
 // component
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -30,6 +31,7 @@ import { MenuLeftComponent } from './components/menu-left/menu-left.component';
 import { MenuTopComponent } from './components/menu-top/menu-top.component';
 import { UserComponent } from './components/users/user/user.component';
 import { ProjectComponent } from './components/project/project.component';
+import { DecentralizationComponent } from './components/users/decentralization/decentralization.component';
 
 
 @NgModule({
@@ -42,6 +44,7 @@ import { ProjectComponent } from './components/project/project.component';
     MenuTopComponent,
     UserComponent,
     ProjectComponent,
+    DecentralizationComponent,
   ],
   imports: [
     BrowserModule,
@@ -58,6 +61,7 @@ import { ProjectComponent } from './components/project/project.component';
     InputTextModule,
     DropdownModule,
     FileUploadModule,
+    TreeModule,
     StoreModule.forRoot(reducers, {metaReducers})
   ],
   providers: [

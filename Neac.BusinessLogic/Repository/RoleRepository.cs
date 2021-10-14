@@ -15,14 +15,38 @@ namespace Neac.BusinessLogic.Repository
 {
     public class RoleRepository : IRoleRepository
     {
+        private readonly ILogRepository _logRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserRepository _userRepository;
         private readonly IMemoryCache _memoryCache;
-        public RoleRepository(IUnitOfWork unitOfWork, IUserRepository userRepository, IMemoryCache memoryCache)
+        public RoleRepository(IUnitOfWork unitOfWork, IUserRepository userRepository, IMemoryCache memoryCache, ILogRepository logRepository)
         {
             _unitOfWork = unitOfWork;
             _userRepository = userRepository;
             _memoryCache = memoryCache;
+            _logRepository = logRepository;
+        }
+
+        public async Task<Response<GetRolesAndGroupDto>> DecentralizatedRole(Guid userId)
+        {
+            try
+            {
+                var roleSelected = await _unitOfWork.GetRepository<UserRole>().GetAll().Where(n => n.UserId == userId).Select(n => n.RoleId.Value).ToListAsync();
+
+                var listRole = await _unitOfWork.GetRepository<GroupRole>().GetAll().Include(n => n.Roles).Select(n => new DecentralizatedDto
+                { 
+                    Data = n.GroupRoleId,
+                    Label = n.GroupRoleName,
+                    Children = n.Roles.Select(g => new DecentralizatedDto { Data = g.RoleId, Label = g.RoleName })
+                }).ToListAsync();
+
+                return Response<GetRolesAndGroupDto>.CreateSuccessResponse(new GetRolesAndGroupDto {ListRole = listRole, SelectedIds = roleSelected });
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<GetRolesAndGroupDto>.CreateErrorResponse(ex);
+            }
         }
 
         public async Task<Response<GetRolesByUserDtos>> GetUserRole(Guid userId)

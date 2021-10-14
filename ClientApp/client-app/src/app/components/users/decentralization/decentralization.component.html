@@ -1,0 +1,21 @@
+<div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
+    <div class="mdl-card mdl-shadow--2dp line-chart">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Phân quyền người dùng</h2>
+        </div>
+        <div class="mdl-card__supporting-text w-100">
+            <div class="w-100">
+                <button
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end" (click)="save()">
+                    <i class="material-icons">save</i>
+                    Lưu
+                </button>
+            </div>
+            <div class="mt-5">
+                <p-tree [value]="data" selectionMode="checkbox" [(selection)]="selectedFiles"
+                    [propagateSelectionUp]="true" [propagateSelectionDown]="true" (onNodeSelect)="onNodeSelect($event)" (onNodeUnselect)="onNodeUnselect($event)">
+                </p-tree>
+            </div>
+        </div>
+    </div>
+</div>

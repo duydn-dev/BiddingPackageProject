@@ -42,6 +42,9 @@ export class UserService {
   uploadAvatar(file:any) :Observable<any>{
     const formData = new FormData(); 
     formData.append('file', file);
-    return this._baseService.uploadFile("api/user/upload-avatar",formData)
+    return this._baseService.uploadFile("api/user/upload-avatar", formData)
+  }
+  getRoleAndRoleSelected(userId:any) :Observable<any>{
+    return this._baseService.get("api/role/decentralizated-role", userId);
   }
 }

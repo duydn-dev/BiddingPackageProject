@@ -24,22 +24,26 @@
             <table class="mdl-data-table mdl-js-data-table bordered-table w-100">
                 <thead>
                 <tr>
-                    <th class="mdl-data-table__cell--non-numeric">STT</th>
+                    <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
                     <th class="mdl-data-table__cell--non-numeric">Tên</th>
                     <th class="mdl-data-table__cell--non-numeric">Địa chỉ</th>
                     <th class="mdl-data-table__cell--non-numeric">Email</th>
                     <th class="mdl-data-table__cell--non-numeric">SDT</th>
-                    <th class="mdl-data-table__cell--non-numeric">Thao tác</th>
+                    <th class="mdl-data-table__cell--non-numeric w-50px">Thao tác</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr *ngFor="let item of users; let i = index">
-                    <td class="mdl-data-table__cell--non-numeric">{{i + 1}}</td>
+                    <td class="mdl-data-table__cell--non-numeric text-center">{{((search.pageIndex - 1) * search.pageSize) + i + 1}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.userName}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.address}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.email}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.numberPhone}}</td>
-                    <td class="mdl-data-table__cell--non-numeric">
+                    <td class="mdl-data-table__cell--non-numeric w-50px text-center">
+                        <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" [routerLink]="'/decentralization/' + item.userId">
+                            <i class="material-icons">engineering</i>
+                            Phân quyền
+                        </a>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openEditForm(item.userId)">
                             <i class="material-icons">create</i>
                             Sửa
@@ -153,7 +157,7 @@
                 <i class="material-icons">check</i>
                 Lưu
             </button>
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-dark" title="Đóng" (click)="isShowModal=false">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-light" title="Đóng" (click)="isShowModal=false">
                 <i class="material-icons">close</i>
                 Đóng
             </button>

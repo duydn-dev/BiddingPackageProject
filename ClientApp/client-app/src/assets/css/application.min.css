@@ -3462,7 +3462,7 @@ input.mdl-button[type=submit] {
     position: relative;
     border-collapse: collapse;
     white-space: nowrap;
-    font-size: 16px
+    /* font-size: 16px */
 }
 
 .mdl-data-table thead {
@@ -6862,9 +6862,9 @@ main {
     display: block
 }
 
-.mdl-layout__drawer .mdl-navigation .sub-navigation--show .mdl-navigation__link i:last-child {
+/* .mdl-layout__drawer .mdl-navigation .sub-navigation--show .mdl-navigation__link i:last-child {
     transform: rotate(180deg)
-}
+} */
 
 .mdl-layout__header-row {
     color: rgba(255, 255, 255, .8)

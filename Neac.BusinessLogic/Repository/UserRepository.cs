@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,7 @@ using System.Threading.Tasks;
 
 namespace Neac.BusinessLogic.Repository
 {
+    [Obsolete]
     public class UserRepository : IUserRepository
     {
         private readonly ILogRepository _logRepository;
@@ -27,12 +29,14 @@ namespace Neac.BusinessLogic.Repository
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
         public UserRepository(
             ILogRepository logRepository,
             IConfiguration configuration,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IHostingEnvironment hostingEnvironment
             )
         {
             _logRepository = logRepository;
@@ -40,6 +44,7 @@ namespace Neac.BusinessLogic.Repository
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         #region CRUD
@@ -238,12 +243,14 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
-                string vitualPath = Path.Combine(_configuration.GetSection("VitualDirectoryPath").Value , avatar.FileName);
+                string newFileName = Path.GetFileNameWithoutExtension(avatar.FileName) + DateTime.Now.ToString("ddMMyyyyHHmmss") + Path.GetExtension(avatar.FileName);
+                string filePath = "Uploads\\" + newFileName;
+                string vitualPath = Path.Combine(_hostingEnvironment.WebRootPath, filePath);
                 using (var stream = new FileStream(vitualPath, FileMode.Create))
                 {
                     await avatar.CopyToAsync(stream);
                 }
-                return Response<string>.CreateSuccessResponse(vitualPath.Replace(Path.GetPathRoot(vitualPath), "").Replace("\\", "/").Replace("\"", "/"));
+                return Response<string>.CreateSuccessResponse(filePath);
             }
             catch(Exception ex)
             {

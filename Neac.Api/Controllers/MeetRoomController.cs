@@ -16,7 +16,7 @@ namespace Neac.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [RoleGroupDescription("Quản lý nhóm tài khoản")]
+    [RoleGroupDescription("Quản lý phòng họp")]
     public class MeetRoomController : ControllerBase
     {
         private readonly IMeetRoomRepository _meetRoomRepository;

@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Neac.DataAccess\Neac.DataAccess.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploads\" />
+  </ItemGroup>
+
 </Project>

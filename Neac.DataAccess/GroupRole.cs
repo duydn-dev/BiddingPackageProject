@@ -16,6 +16,6 @@ namespace Neac.DataAccess
         public string GroupRoleName {get;set;}
         public string GroupRoleCode { get; set; }
 
-        public List<Role> GroupRoles { get; set; }
+        public List<Role> Roles { get; set; }
     }
 }

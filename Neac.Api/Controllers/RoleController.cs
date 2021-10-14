@@ -67,5 +67,13 @@ namespace Neac.Api.Controllers
         {
             return await _roleRepository.GetUserRole(userId);
         }
+
+        [RoleDescription("Lấy danh sách quyền và quyền đã chọn")]
+        [Route("decentralizated-role/{userId}")]
+        [HttpGet]
+        public async Task<Response<GetRolesAndGroupDto>> DecentralizatedRole(Guid userId)
+        {
+            return await _roleRepository.DecentralizatedRole(userId);
+        }
     }
 }

@@ -83,6 +83,8 @@ export class UserComponent implements OnInit {
     this.previewAvatar = null;
     this.avatar = null;
     this.userId = userId;
+    this.previewAvatar = null;
+    this.fullAvatarPath = null;
     this.userForm.reset();
     if(!userId){
       this.isShowModal = true;

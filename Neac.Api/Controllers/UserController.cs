@@ -89,7 +89,7 @@ namespace Neac.Api.Controllers
         [RoleDescription("Xóa nhiều tài khoản")]
         [Route("delete")]
         [HttpDelete]
-        public async Task<Response<bool>> Delete([FromQuery]List<Guid> userIds)
+        public async Task<Response<bool>> DeleteMany([FromQuery]List<Guid> userIds)
         {
             return await _userRepository.DeleteMany(userIds);
         }
