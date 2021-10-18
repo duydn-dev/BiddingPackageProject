@@ -38,6 +38,14 @@ namespace Neac.Api.Controllers
             return await _biddingPackageRepository.GetByIdAsync(packageId);
         }
 
+        [Route("with-document/{packageId}")]
+        [HttpGet]
+        [RoleDescription("Xem chi tiết gói thầu - bao gồm văn bản")]
+        public async Task<Response<BiddingPackageByIdDto>> GetByBiddingPackageIdAsync(Guid packageId)
+        {
+            return await _biddingPackageRepository.GetByBiddingPackageIdAsync(packageId);
+        }
+
         [Route("create")]
         [HttpPost]
         [RoleDescription("Thêm mới gói thầu")]

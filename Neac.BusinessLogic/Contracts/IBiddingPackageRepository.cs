@@ -12,6 +12,7 @@ namespace Neac.BusinessLogic.Contracts
     {
         Task<Response<GetListResponseModel<List<BiddingPackageDto>>>> GetFilter(string filter);
         Task<Response<BiddingPackageDto>> GetByIdAsync(Guid projectId);
+        Task<Response<BiddingPackageByIdDto>> GetByBiddingPackageIdAsync(Guid biddingPackageId);
         Task<Response<BiddingPackageDto>> CreateAsync(BiddingPackageDto request);
         Task<Response<BiddingPackageDto>> UpdateAsync(BiddingPackageDto request);
         Task<Response<bool>> DeleteAsync(Guid projectId);

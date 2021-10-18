@@ -23,6 +23,11 @@ export class MenuLeftComponent implements OnInit {
         link: "/project",
         icon: "cases",
       },
+      {
+        name: "Gói thầu",
+        link: "/bidding-package",
+        icon: "cases",
+      },
       // {
       //   name: "Phòng họp",
       //   link: "/rooms",

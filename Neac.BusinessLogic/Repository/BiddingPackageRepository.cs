@@ -63,6 +63,23 @@ namespace Neac.BusinessLogic.Repository
                 return Response<BiddingPackageDto>.CreateErrorResponse(ex);
             }
         }
+        public async Task<Response<BiddingPackageByIdDto>> GetByBiddingPackageIdAsync(Guid biddingPackageId)
+        {
+            try
+            {
+                var query = await _unitOfWork.GetRepository<BiddingPackage>()
+                    .GetAll()
+                    .Include(n => n.Documents)
+                    .FirstOrDefaultAsync(n => n.BiddingPackageId == biddingPackageId);
+
+                return Response<BiddingPackageByIdDto>.CreateSuccessResponse(_mapper.Map<BiddingPackage, BiddingPackageByIdDto>(query));
+            }
+            catch (Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<BiddingPackageByIdDto>.CreateErrorResponse(ex);
+            }
+        }
         public async Task<Response<BiddingPackageDto>> CreateAsync(BiddingPackageDto request)
         {
             try

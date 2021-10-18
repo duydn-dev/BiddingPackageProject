@@ -16,5 +16,6 @@ namespace Neac.DataAccess
         public string BiddingPackageName { get; set; }
 
         public List<BiddingPackageProject> BiddingPackageProjects { get; set; }
+        public List<Document> Documents { get; set; }
     }
 }

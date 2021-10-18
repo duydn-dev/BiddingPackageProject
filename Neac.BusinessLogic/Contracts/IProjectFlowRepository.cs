@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Neac.Common.Dtos;
+using Neac.DataAccess;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,8 @@ namespace Neac.BusinessLogic.Contracts
 {
     public interface IProjectFlowRepository
     {
+        Task<Response<GetListResponseModel<List<ProjectFlow>>>> GetFilterAsync(string filter);
+        Task<Response<ProjectFlow>> CreateAsync(ProjectFlow request);
+        Task<Response<ProjectFlow>> UpdateAsync(ProjectFlow request);
     }
 }

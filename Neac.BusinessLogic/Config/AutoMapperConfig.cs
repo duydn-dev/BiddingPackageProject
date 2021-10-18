@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Neac.Common.Dtos;
 using Neac.Common.Dtos.BiddingPackage;
+using Neac.Common.Dtos.DocumentDtos;
 using Neac.Common.Dtos.PositionDtos;
 using Neac.Common.Dtos.ProjectDtos;
 using Neac.DataAccess;
@@ -24,9 +25,15 @@ namespace Neac.BusinessLogic.Config
             CreateMap<UserPosition, PositonGetDropdownViewDto>();
             CreateMap<PositonGetDropdownViewDto, UserPosition>().ForMember(x => x.Users, g => g.Ignore());
 
-            CreateMap<BiddingPackage, BiddingPackageDto>();
+            CreateMap<BiddingPackage, BiddingPackageDto>()
+                .ForMember(n => n.Order, g => g.Ignore());
             CreateMap<BiddingPackageDto, BiddingPackage>()
-                .ForMember(n => n.BiddingPackageProjects, src => src.Ignore());
+                .ForMember(n => n.BiddingPackageProjects, src => src.Ignore())
+                .ForMember(n => n.Documents, src => src.Ignore());
+            CreateMap<BiddingPackage, BiddingPackageByIdDto>()
+                .ForMember(n => n.Documents, g => g.MapFrom(m => m.Documents));
+            CreateMap<BiddingPackageByIdDto, BiddingPackage>()
+                .ForMember(n => n.Documents, g => g.MapFrom(m => m.Documents));
 
             CreateMap<BiddingPackageProject, BiddingPackageProjectDto>();
             CreateMap<BiddingPackageProjectDto, BiddingPackageProject>()
@@ -39,6 +46,13 @@ namespace Neac.BusinessLogic.Config
                 .ForMember(n => n.BiddingPackageProjectDtos, src => src.MapFrom(n => n.BiddingPackageProjects));
             CreateMap<ProjectGetByIdDto, Project>()
                .ForMember(n => n.BiddingPackageProjects, src => src.MapFrom(n => n.BiddingPackageProjectDtos));
+
+            CreateMap<ProjectFlow, ProjectFlow>()
+                .ForMember(n => n.ProjectFlowId, g => g.Ignore());
+
+            CreateMap<Document, DocumentDto>();
+            CreateMap<DocumentDto, Document>()
+                .ForMember(n => n.BiddingPackage, g => g.Ignore());
         }
     }
 }

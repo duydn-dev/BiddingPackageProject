@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Neac.Api.Controllers
 {
+    [UserAuthorize]
     [Route("api/[controller]")]
     [ApiController]
     [RoleGroupDescription("Quản lý dự án")]

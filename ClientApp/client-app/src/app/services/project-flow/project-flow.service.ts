@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { BaseService } from '../base/base-service.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BiddingService {
+export class ProjectFlowService {
 
   constructor(
     private _baseService: BaseService
@@ -13,9 +12,6 @@ export class BiddingService {
   }
   getFilter(filter:any){
     return this._baseService.getWithQuery("api/biddingpackage","filter",JSON.stringify(filter))
-  }
-  getById(biddingPackageId:any){
-    return this._baseService.get("api/biddingpackage/with-document", biddingPackageId);
   }
   create(biddingPackage:any){
     return this._baseService.post("api/biddingpackage/create", biddingPackage);

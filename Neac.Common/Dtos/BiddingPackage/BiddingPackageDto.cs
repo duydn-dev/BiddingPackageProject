@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neac.Common.Dtos.DocumentDtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,11 @@ namespace Neac.Common.Dtos.BiddingPackage
         public Guid BiddingPackageId { get; set; }
         public string BiddingPackageName { get; set; }
         public int? Order { get; set; }
+    }
+    public class BiddingPackageByIdDto
+    {
+        public Guid? BiddingPackageId { get; set; }
+        public string BiddingPackageName { get; set; }
+        public List<DocumentDto> Documents { get; set; }
     }
 }
