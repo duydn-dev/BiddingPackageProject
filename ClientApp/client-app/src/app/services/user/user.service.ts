@@ -47,4 +47,7 @@ export class UserService {
   getRoleAndRoleSelected(userId:any) :Observable<any>{
     return this._baseService.get("api/role/decentralizated-role", userId);
   }
+  updateRole(updateRoleUser:any){
+    return this._baseService.post("api/role/update-user-role", updateRoleUser);
+  }
 }

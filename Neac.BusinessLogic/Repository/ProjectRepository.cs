@@ -58,19 +58,23 @@ namespace Neac.BusinessLogic.Repository
             {
                 var query = await _unitOfWork.GetRepository<Project>().GetAll()
                     .Include(n => n.BiddingPackageProjects)
-                    .ThenInclude(n => n.BiddingPackage)
                     .Where(n => n.ProjectId == projectId)
                     .FirstOrDefaultAsync();
 
-                var biddingPackages = query.BiddingPackageProjects.Select(n => n.BiddingPackage).OrderByDescending(n => n.Order).ToList();
-                var mapped = _mapper.Map<List<BiddingPackage>, List<BiddingPackageDto>>(biddingPackages);
+                var biddingPackagesProjects = await (_unitOfWork.GetRepository<BiddingPackage>().GetAll().Join(
+                        _unitOfWork.GetRepository<BiddingPackageProject>().GetAll().Where(n => n.ProjectId == query.ProjectId),
+                        left => left.BiddingPackageId,
+                        right => right.BiddingPackageId,
+                        (l, r) => new BiddingPackageDto
+                        {
+                            BiddingPackageId = l.BiddingPackageId,
+                            BiddingPackageName = l.BiddingPackageName,
+                            Order = r.Order
+                        })).ToListAsync();
 
-                var response = _mapper.Map<ProjectGetListDto>(query);
-                response.BiddingPackageDtos = mapped;
-
-                //var data = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectId)
-                //    .Include(n => n.BiddingPackageProjects).FirstOrDefaultAsync();
-                return Response<ProjectGetListDto>.CreateSuccessResponse(response);
+                var mapped = _mapper.Map<Project, ProjectGetListDto>(query);
+                mapped.BiddingPackageDtos = biddingPackagesProjects;
+                return Response<ProjectGetListDto>.CreateSuccessResponse(mapped);
             }
             catch (Exception ex)
             {
@@ -82,6 +86,7 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                request.ProjectDate = request.ProjectDate.Value.AddDays(1);
                 request.ProjectId = Guid.NewGuid();
                 if (request?.BiddingPackageDtos.Count > 0)
                 {
@@ -91,7 +96,8 @@ namespace Neac.BusinessLogic.Repository
                         {
                             BiddingPackageProjectId = Guid.NewGuid(),
                             ProjectId = request.ProjectId,
-                            BiddingPackageId = n.BiddingPackageId
+                            BiddingPackageId = n.BiddingPackageId,
+                            Order = n.Order
                         });
                     });
                 }

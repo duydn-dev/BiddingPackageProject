@@ -37,7 +37,7 @@ namespace Neac.BusinessLogic.Repository
 
                 GetListResponseModel<List<BiddingPackageDto>> responseData = new GetListResponseModel<List<BiddingPackageDto>>(query.Count(), request.PageSize);
                 var result = await query
-                    .OrderByDescending(n => n.Order)
+                    .OrderByDescending(n => n.BiddingPackageName)
                     .Skip(request.PageSize * (request.PageIndex - 1)).Take(request.PageSize)
                     .ToListAsync();
 

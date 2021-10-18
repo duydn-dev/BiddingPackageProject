@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neac.DataAccess;
 
 namespace Neac.DataAccess.Migrations
 {
     [DbContext(typeof(NeacDbContext))]
-    partial class NeacDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211015023617_update_Bidding_Package_tbl")]
+    partial class update_Bidding_Package_tbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,31 +57,6 @@ namespace Neac.DataAccess.Migrations
                     b.HasIndex("ProjectId");
 
                     b.ToTable("BiddingPackageProject");
-                });
-
-            modelBuilder.Entity("Neac.DataAccess.Document", b =>
-                {
-                    b.Property<Guid>("DocumentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("BiddingPackageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DocumentName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsCommon")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DocumentId");
-
-                    b.HasIndex("BiddingPackageId");
-
-                    b.ToTable("Document");
                 });
 
             modelBuilder.Entity("Neac.DataAccess.GroupRole", b =>
@@ -149,50 +126,6 @@ namespace Neac.DataAccess.Migrations
                     b.HasKey("ProjectId");
 
                     b.ToTable("Project");
-                });
-
-            modelBuilder.Entity("Neac.DataAccess.ProjectFlow", b =>
-                {
-                    b.Property<Guid>("ProjectFlowId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("BiddingPackageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DocumentAbstract")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DocumentNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ProjectDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PromulgateUnit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RegulationDocument")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Signer")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProjectFlowId");
-
-                    b.ToTable("ProjectFlow");
                 });
 
             modelBuilder.Entity("Neac.DataAccess.Role", b =>
@@ -347,15 +280,6 @@ namespace Neac.DataAccess.Migrations
                     b.Navigation("BiddingPackage");
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("Neac.DataAccess.Document", b =>
-                {
-                    b.HasOne("Neac.DataAccess.BiddingPackage", "BiddingPackage")
-                        .WithMany()
-                        .HasForeignKey("BiddingPackageId");
-
-                    b.Navigation("BiddingPackage");
                 });
 
             modelBuilder.Entity("Neac.DataAccess.Role", b =>

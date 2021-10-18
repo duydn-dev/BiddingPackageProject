@@ -21,6 +21,8 @@ import {InputTextModule} from 'primeng/inputtext';
 import {DropdownModule} from 'primeng/dropdown';
 import {FileUploadModule} from 'primeng/fileupload';
 import {TreeModule} from 'primeng/tree';
+import {CalendarModule} from 'primeng/calendar';
+import {InputTextareaModule} from 'primeng/inputtextarea';
 
 // component
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -62,6 +64,8 @@ import { DecentralizationComponent } from './components/users/decentralization/d
     DropdownModule,
     FileUploadModule,
     TreeModule,
+    CalendarModule,
+    InputTextareaModule,
     StoreModule.forRoot(reducers, {metaReducers})
   ],
   providers: [

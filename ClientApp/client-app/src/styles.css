@@ -14,3 +14,12 @@ html, body{
 .mr-10{
   margin-right: 10px;
 }
+.lh-30px{
+  line-height: 30px;
+}
+.logo{
+  font-size: 50px;
+  border-bottom: 3px solid #fff;
+  color: #fff;
+  margin-left: 1rem;
+}

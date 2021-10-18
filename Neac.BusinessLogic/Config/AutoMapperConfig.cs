@@ -28,9 +28,17 @@ namespace Neac.BusinessLogic.Config
             CreateMap<BiddingPackageDto, BiddingPackage>()
                 .ForMember(n => n.BiddingPackageProjects, src => src.Ignore());
 
+            CreateMap<BiddingPackageProject, BiddingPackageProjectDto>();
+            CreateMap<BiddingPackageProjectDto, BiddingPackageProject>()
+                .ForMember(n => n.Project, src => src.Ignore());
+
             CreateMap<Project, ProjectGetListDto>()
                 .ForMember(dest => dest.BiddingPackageDtos, opt => opt.Ignore());
             CreateMap<ProjectGetListDto, Project>();
+            CreateMap<Project, ProjectGetByIdDto>()
+                .ForMember(n => n.BiddingPackageProjectDtos, src => src.MapFrom(n => n.BiddingPackageProjects));
+            CreateMap<ProjectGetByIdDto, Project>()
+               .ForMember(n => n.BiddingPackageProjects, src => src.MapFrom(n => n.BiddingPackageProjectDtos));
         }
     }
 }

@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace Neac.DataAccess
 {
-    [Table("BiddingPackageProject")]
-    public class BiddingPackageProject
+    [Table("Document")]
+    public class Document
     {
         [Key]
-        public Guid BiddingPackageProjectId { get; set; }
+        public Guid DocumentId { get; set; }
+        public string DocumentName { get; set; }
+        public string Note { get; set; }
+        public bool? IsCommon { get; set; } // dùng chung cho nhiều gói thầu
         public Guid? BiddingPackageId { get; set; }
-        public Guid? ProjectId { get; set; }
-        public int? Order { get; set; }
 
         public BiddingPackage BiddingPackage { get; set; }
-        public Project Project { get; set; }
     }
 }

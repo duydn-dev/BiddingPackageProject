@@ -19,6 +19,7 @@ namespace Neac.Api.Installer
 {
     public static class InstallerService
     {
+        [Obsolete]
         public static void Installer(this IServiceCollection services, IConfiguration Configuration)
         {
             // add dbcontext
@@ -62,6 +63,8 @@ namespace Neac.Api.Installer
             services.AddTransient<IPositionRepository, PositionRepository>();
             services.AddTransient<IProjectRepository, ProjectRepository>();
             services.AddTransient<IBiddingPackageRepository, BiddingPackageRepository>();
+            services.AddTransient<IDocumentRepository, DocumentRepository>();
+            services.AddTransient<IProjectFlowRepository, ProjectFlowRepository>();
             // add user-defined service
         }
     }

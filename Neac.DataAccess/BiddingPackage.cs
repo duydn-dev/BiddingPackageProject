@@ -14,7 +14,6 @@ namespace Neac.DataAccess
         [Key]
         public Guid BiddingPackageId { get; set; }
         public string BiddingPackageName { get; set; }
-        public int? Order { get; set; }
 
         public List<BiddingPackageProject> BiddingPackageProjects { get; set; }
     }

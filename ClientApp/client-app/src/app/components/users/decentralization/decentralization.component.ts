@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { TreeNode } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
 import { UserService } from 'src/app/services/user/user.service';
 import {ActivatedRoute} from '@angular/router';
 
@@ -15,6 +15,7 @@ export class DecentralizationComponent implements OnInit {
   userId: any;
   constructor(
     private route: ActivatedRoute,
+    private _messageService: MessageService,
     private _userService: UserService
   ) { }
 
@@ -74,6 +75,17 @@ export class DecentralizationComponent implements OnInit {
     }
   }
   save(){
-    console.log(this.arr);
+    const obj = {
+      userId: this.userId,
+      roleIds: this.arr
+    }
+    this._userService.updateRole(obj).subscribe(response => {
+      if(response.success){
+        this._messageService.add({ severity: 'success', summary: 'Thành công', detail: "Cập nhật quyền thành công !" });
+      }
+      else{
+        this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
+      }
+    })
   }
 }

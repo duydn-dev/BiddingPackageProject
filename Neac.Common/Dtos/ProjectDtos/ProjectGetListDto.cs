@@ -22,4 +22,13 @@ namespace Neac.Common.Dtos.ProjectDtos
             BiddingPackageDtos = new List<BiddingPackageDto>();
         }
     }
+    public class ProjectGetByIdDto
+    {
+        public Guid? ProjectId { get; set; }
+        public string ProjectName { get; set; }
+        public DateTime? ProjectDate { get; set; }
+        public string Note { get; set; }
+        public int? CurrentState { get; set; }
+        public List<BiddingPackageProjectDto> BiddingPackageProjectDtos { get; set; }
+    }
 }

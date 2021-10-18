@@ -36,7 +36,7 @@
                 <tr *ngFor="let item of projects; let i = index">
                     <td class="mdl-data-table__cell--non-numeric text-center">{{((search.pageIndex - 1) * search.pageSize) + i + 1}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.projectName}}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{item.projectDate | date: "dd/mm/yyyy"}}</td>
+                    <td class="mdl-data-table__cell--non-numeric">{{item.projectDate | date: "dd/MM/yyyy"}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.note}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.currentState}}</td>
                     <td class="mdl-data-table__cell--non-numeric w-50px text-center">
@@ -58,11 +58,11 @@
 </div>
 
 
-<p-dialog [header]="projectId ? 'Chỉnh sửa dự án' : 'Thêm mới dự án'" [(visible)]="isShowModal" [modal]="true" [style]="{width: '70vw', 'z-index': '1000'}"
+<p-dialog [header]="projectId ? 'Chỉnh sửa dự án' : 'Thêm mới dự án'" [(visible)]="isShowModal" [modal]="true" [style]="{width: '70vw'}"
     [draggable]="false" [resizable]="false">
         <form (ngSubmit)="onSubmit()" [formGroup]="projectForm">
             <div class="form-group">
-                <label class="col-lg-12">Tên dự án</label>
+                <label class="col-lg-12 lh-30px">Tên dự án <span class="text-danger">*</span></label>
                 <div class="col-lg-12">
                     <input type="text" pInputText formControlName="projectName" placeholder="Tên dự án..." class="w-100"/>
                     <div class="error pl-0" *ngIf="(form.projectName.touched || isSubmit)">
@@ -70,5 +70,60 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group">
+                <label class="col-lg-12 lh-30px">Ngày tạo <span class="text-danger">*</span></label>
+                <div class="col-lg-12">
+                    <p-calendar formControlName="projectDate" [showIcon]="true" inputId="icon" dateFormat="dd/mm/yy" styleClass="w-100"></p-calendar>
+                    <div class="error pl-0" *ngIf="(form.projectDate.touched || isSubmit)">
+                        <p class="text-danger" *ngIf="form.projectDate.errors?.required">Ngày dự án không thể để trống</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-12 lh-30px">Ghi chú</label>
+                <div class="col-lg-12">
+                    <textarea class="w-100" style="height: 100px;" [rows]="5" pInputTextarea formControlName="note"></textarea>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label class="col-lg-12 lh-30px">Danh sách gói thầu</label>
+                <div class="col-lg-12">
+                    <div class="card">
+                        <p-table [value]="packages" [(selection)]="packageSelected" dataKey="biddingPackageId" responsiveLayout="scroll" (onRowSelect)="onRowSelect($event)" (onRowUnselect)="onRowUnselect($event)">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 3rem">
+                                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                                    </th>
+                                    <th>Tên gói thầu</th>
+                                    <th>Thứ tự</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-package>
+                                <tr>
+                                    <td>
+                                        <p-tableCheckbox [value]="package"></p-tableCheckbox>
+                                    </td>
+                                    <td>{{package.biddingPackageName}}</td>
+                                    <td>{{(projectId) ? findOrder(package) : package.order}}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                        <p-paginator [rows]="packageSearch.pageSize" [totalRecords]="totalPackage" (onPageChange)="packagePageChange($event)"></p-paginator>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group float-end pt-3 pb-3">
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue mr-10" title="Lưu" type="submit">
+                    <i class="material-icons">check</i>
+                    Lưu
+                </button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-light" title="Đóng" (click)="isShowModal=false">
+                    <i class="material-icons">close</i>
+                    Đóng
+                </button>
+            </div>
         </form>
 </p-dialog>
+
+<p-confirmDialog header="" icon="pi pi-exclamation-triangle"></p-confirmDialog>
