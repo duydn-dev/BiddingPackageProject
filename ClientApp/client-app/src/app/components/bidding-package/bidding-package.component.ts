@@ -21,7 +21,6 @@ export class BiddingPackageComponent implements OnInit {
   biddingPackageId:any;
   packageForm: FormGroup;
   isSubmit:boolean = false;
-  documents:any = [];
 
   // documents
   get form() { return this.packageForm.controls; }
@@ -35,11 +34,9 @@ export class BiddingPackageComponent implements OnInit {
 
   ngOnInit(): void {
     this.getFilter();
-    this.getDocuments();
     this.packageForm = this._fb.group({
       biddingPackageId: this._fb.control(null),
-      biddingPackageName: this._fb.control(null, [Validators.required]),
-      documentIds : this._fb.array([])
+      biddingPackageName: this._fb.control(null, [Validators.required])
     })
   }
   getFilter(){
@@ -56,16 +53,7 @@ export class BiddingPackageComponent implements OnInit {
     if(biddingPackageId){
       this._biddingService.getById(biddingPackageId).subscribe(response => {
         if(response.success){
-          console.log(response.responseData);
-          // this.packageForm.patchValue({
-          //   note: response.responseData.note,
-          //   projectDate: new Date(response.responseData.projectDate),
-          //   projectId: response.responseData.projectId,
-          //   projectName: response.responseData.projectName
-          // });
-          // if(response.responseData.biddingPackageDtos && response.responseData.biddingPackageDtos.length > 0){
-          //   this.packageSelected = response.responseData.biddingPackageDtos
-          // }
+          this.packageForm.patchValue({...response.responseData});
           this.isShowModal = true;
         }
       })
@@ -99,6 +87,30 @@ export class BiddingPackageComponent implements OnInit {
     if (this.packageForm.invalid) {
       return;
     }
+    if(this.packageForm.get("biddingPackageId").value){
+      this._biddingService.update(this.packageForm.get("biddingPackageId").value, this.packageForm.value).subscribe(response => {
+        if(response.success){
+          this.getFilter();
+          this.isShowModal = false;
+          this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Cập nhật thành công !' });
+        }
+        else{
+          this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
+        }
+      })
+    }
+    else{
+      this._biddingService.create(this.packageForm.value).subscribe(response => {
+        if(response.success){
+          this.getFilter();
+          this.isShowModal = false;
+          this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Thêm mới thành công !' });
+        }
+        else{
+          this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
+        }
+      })
+    }
   }
   searchData(){
     this.search.pageIndex = 1;
@@ -108,11 +120,11 @@ export class BiddingPackageComponent implements OnInit {
     this.search.pageIndex = (event.page + 1);
     this.getFilter();
   }
-  getDocuments(){
-    this._documentService.getDropDown().subscribe(response => {
-      if(response.success){
-        this.documents = response.responseData;
-      }
-    })
-  }
+  // getDocuments(){
+  //   this._documentService.getDropDown().subscribe(response => {
+  //     if(response.success){
+  //       this.documents = response.responseData;
+  //     }
+  //   })
+  // }
 }

@@ -1,0 +1,78 @@
+<div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
+    <div class="mdl-card mdl-shadow--2dp line-chart">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Chi tiết dự án</h2>
+        </div>
+        <div class="mdl-card__supporting-text w-100">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="package-group">
+                            <div class="package-item" *ngFor="let item of packages">
+                                <div class="d-flex bd-highlight h-100 pl-10px">
+                                    <div class="bd-highlight">
+                                        <div class="package-number">{{item.order}}</div>
+                                    </div>
+                                    <div class="bd-highlight">
+                                        <div class="package-name">{{item.label}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue"
+                            (click)="openCreatePackageForm()">
+                            <i class="material-icons">add_circle</i>
+                            Thêm gói thầu
+                        </button>
+                    </div>
+                    <div class="col-lg-9">
+                        <p-steps [model]="packages"></p-steps>
+                        <div class="mt-4">
+                            <button
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end mb-2"
+                                (click)="openCreatePackageForm()">
+                                <i class="material-icons">add_circle</i>
+                                Thêm văn bản
+                            </button>
+                        </div>
+                        <table class="mdl-data-table mdl-js-data-table bordered-table w-100 mt-2">
+                            <thead>
+                            <tr>
+                                <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
+                                <th class="mdl-data-table__cell--non-numeric text-center">Tên văn bản</th>
+                                <th class="mdl-data-table__cell--non-numeric text-center">Người ký</th>
+                                <th class="mdl-data-table__cell--non-numeric text-center">Ngày ký</th>
+                                <th class="mdl-data-table__cell--non-numeric text-center">Số văn bản</th>
+                                <th class="mdl-data-table__cell--non-numeric text-center">Tình trạng</th>
+                                <th class="mdl-data-table__cell--non-numeric text-center">File đính kèm</th>
+                                <th class="mdl-data-table__cell--non-numeric w-50px text-center">Thao tác</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <!-- <tr *ngFor="let item of users; let i = index">
+                                <td class="mdl-data-table__cell--non-numeric text-center">{{i + 1}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.numberPhone}}</td>
+                                <td class="mdl-data-table__cell--non-numeric w-50px text-center">
+                                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" [routerLink]="'/decentralization/' + item.userId">
+                                        <i class="material-icons">engineering</i>
+                                        Phân quyền
+                                    </a>
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openEditForm(item.userId)">
+                                        <i class="material-icons">create</i>
+                                        Sửa
+                                    </button>
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red" (click)="openDeleteForm(item.userId)">
+                                        <i class="material-icons">delete</i>
+                                        Xóa
+                                    </button>
+                                </td>
+                            </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

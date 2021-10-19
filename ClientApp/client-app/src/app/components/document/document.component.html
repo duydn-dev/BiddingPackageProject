@@ -1,1 +1,116 @@
-<p>document works!</p>
+<div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
+    <div class="mdl-card mdl-shadow--2dp line-chart">
+        <div class="mdl-card__title">
+            <h2 class="mdl-card__title-text">Quản lý văn bản</h2>
+        </div>
+        <div class="mdl-card__supporting-text w-100">
+            <div class="w-100">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable float-start">
+                    <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
+                        <i class="material-icons">search</i>
+                    </label>
+
+                    <div class="mdl-textfield__expandable-holder">
+                        <input class="mdl-textfield__input" type="text" id="search" (keyup.enter)="searchData()"
+                            [(ngModel)]="search.textSearch" />
+                        <label class="mdl-textfield__label" for="search">Tìm kiếm...</label>
+                    </div>
+                </div>
+                <button
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end"
+                    (click)="openEditForm()">
+                    <i class="material-icons">add_circle</i>
+                    Thêm mới
+                </button>
+            </div>
+            <table class="mdl-data-table mdl-js-data-table bordered-table w-100">
+                <thead>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
+                        <th class="mdl-data-table__cell--non-numeric">Tên gói thầu</th>
+                        <th class="mdl-data-table__cell--non-numeric w-50px">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of document; let i = index">
+                        <td class="mdl-data-table__cell--non-numeric text-center">{{((search.pageIndex - 1) *
+                            search.pageSize) + i + 1}}</td>
+                        <td class="mdl-data-table__cell--non-numeric">{{item.documentName}}</td>
+                        <td class="mdl-data-table__cell--non-numeric w-50px text-center">
+                            <button
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20"
+                                (click)="openEditForm(item.documentId)">
+                                <i class="material-icons">create</i>
+                                Sửa
+                            </button>
+                            <button
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red"
+                                (click)="openDeleteForm(item.documentId)">
+                                <i class="material-icons">delete</i>
+                                Xóa
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p-paginator [rows]="search.pageSize" [totalRecords]="totalData" (onPageChange)="onPageChange($event)">
+            </p-paginator>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog [header]="documentId ? 'Chỉnh sửa văn bản' : 'Thêm mới văn bản'" [(visible)]="isShowModal"
+    [modal]="true" [style]="{width: '30vw'}" [draggable]="false" [resizable]="false">
+    <form (ngSubmit)="onSubmit()" [formGroup]="documentForm">
+        <div class="form-group">
+            <label class="col-lg-12 lh-30px">Tên văn bản<span class="text-danger">*</span></label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="documentName" placeholder="Tên văn bản..."
+                    class="w-100" />
+                <div class="error pl-0" *ngIf="(form.documentName.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.documentName.errors?.required">Tên văn bản không thể để
+                        trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12 lh-30px">Văn bản dùng chung</label>
+            <div class="col-lg-12">
+                <p-checkbox name="groupname" label="Dùng chung" [binary]="true" formControlName="isCommon"></p-checkbox>
+            </div>
+        </div>
+        <div class="form-group mt-2" *ngIf="!documentForm.get('isCommon').value">
+            <label class="col-lg-12 lh-30px">Gói thầu</label>
+            <div class="col-lg-12">
+                <p-dropdown [options]="packages" formControlName="biddingPackageId" optionValue="biddingPackageId" optionLabel="biddingPackageName" styleClass="w-100"></p-dropdown>
+                <div class="error pl-0" *ngIf="(form.biddingPackageId.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.biddingPackageId.errors?.required">Tên gói thầu không thể để
+                        trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12 lh-30px">Ghi chú</label>
+            <div class="col-lg-12">
+                <textarea pInputTextarea formControlName="note" class="w-100"></textarea>
+            </div>
+        </div>
+        <div class="form-group float-end pt-3 pb-3">
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue mr-10"
+                title="Lưu" type="submit">
+                <i class="material-icons">check</i>
+                Lưu
+            </button>
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-light"
+                title="Đóng" (click)="isShowModal=false">
+                <i class="material-icons">close</i>
+                Đóng
+            </button>
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog header="" icon="pi pi-exclamation-triangle"></p-confirmDialog>

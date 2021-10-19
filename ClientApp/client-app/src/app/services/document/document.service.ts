@@ -16,6 +16,9 @@ export class DocumentService {
   getDropDown(){
     return this._baseService.get("api/document/dropdown");
   }
+  getById(documentId:any){
+    return this._baseService.get("api/document", documentId);
+  }
   create(document:any){
     return this._baseService.post("api/document/create", document);
   }

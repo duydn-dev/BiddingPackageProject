@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Neac.Api.Attributes;
 using Neac.BusinessLogic.Contracts;
 using Neac.Common.Dtos;
+using Neac.Common.Dtos.DocumentDtos;
 using Neac.DataAccess;
 using System;
 using System.Collections.Generic;
@@ -51,16 +52,16 @@ namespace Neac.Api.Controllers
         [Route("create")]
         [HttpPost]
         [RoleDescription("Thêm mới văn bản")]
-        public async Task<Response<Document>> CreateAsync(Document request)
+        public async Task<Response<DocumentDto>> CreateAsync(DocumentDto request)
         {
             return await _documentRepository.CreateAsync(request);
         }
-        [Route("update/{projectId}")]
+        [Route("update/{documentId}")]
         [HttpPut]
         [RoleDescription("Cập nhật văn bản")]
-        public async Task<Response<Document>> UpdateAsync([FromRoute] Guid projectId, Document request)
+        public async Task<Response<DocumentDto>> UpdateAsync([FromRoute] Guid documentId, DocumentDto request)
         {
-            request.DocumentId = projectId;
+            request.DocumentId = documentId;
             return await _documentRepository.UpdateAsync(request);
         }
         [Route("delete/{projectId}")]

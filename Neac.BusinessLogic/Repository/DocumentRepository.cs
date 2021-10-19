@@ -4,6 +4,7 @@ using Neac.BusinessLogic.Contracts;
 using Neac.BusinessLogic.UnitOfWork;
 using Neac.Common;
 using Neac.Common.Dtos;
+using Neac.Common.Dtos.DocumentDtos;
 using Neac.DataAccess;
 using Newtonsoft.Json;
 using System;
@@ -18,10 +19,12 @@ namespace Neac.BusinessLogic.Repository
     {
         private readonly ILogRepository _logRepository;
         private readonly IUnitOfWork _unitOfWork;
-        public DocumentRepository(ILogRepository logRepository, IUnitOfWork unitOfWork)
+        private readonly IMapper _mapper;
+        public DocumentRepository(ILogRepository logRepository, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _logRepository = logRepository;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
         public async Task<Response<GetListResponseModel<List<Document>>>> GetFilter(string filter)
         {
@@ -78,34 +81,36 @@ namespace Neac.BusinessLogic.Repository
                 return Response<Document>.CreateErrorResponse(ex);
             }
         }
-        public async Task<Response<Document>> CreateAsync(Document request)
+        public async Task<Response<DocumentDto>> CreateAsync(DocumentDto request)
         {
             try
             {
                 request.DocumentId = Guid.NewGuid();
-                await _unitOfWork.GetRepository<Document>().Add(request);
+                var mapped = _mapper.Map<DocumentDto, Document>(request);
+                await _unitOfWork.GetRepository<Document>().Add(mapped);
                 await _unitOfWork.SaveAsync();
-                return Response<Document>.CreateSuccessResponse(request);
+                return Response<DocumentDto>.CreateSuccessResponse(request);
             }
             catch (Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
-                return Response<Document>.CreateErrorResponse(ex);
+                return Response<DocumentDto>.CreateErrorResponse(ex);
             }
         }
-        public async Task<Response<Document>> UpdateAsync(Document request)
+        public async Task<Response<DocumentDto>> UpdateAsync(DocumentDto request)
         {
             try
             {
                 var project = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.DocumentId == request.DocumentId).FirstOrDefaultAsync();
-                await _unitOfWork.GetRepository<Document>().Update(project);
+                var mapped = _mapper.Map<DocumentDto, Document>(request, project);
+                await _unitOfWork.GetRepository<Document>().Update(mapped);
                 await _unitOfWork.SaveAsync();
-                return Response<Document>.CreateSuccessResponse(request);
+                return Response<DocumentDto>.CreateSuccessResponse(request);
             }
             catch (Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
-                return Response<Document>.CreateErrorResponse(ex);
+                return Response<DocumentDto>.CreateErrorResponse(ex);
             }
         }
         public async Task<Response<bool>> DeleteAsync(Guid documentId)

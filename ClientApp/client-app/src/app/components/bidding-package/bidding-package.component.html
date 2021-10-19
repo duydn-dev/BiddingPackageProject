@@ -1,4 +1,3 @@
-
 <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
     <div class="mdl-card mdl-shadow--2dp line-chart">
         <div class="mdl-card__title">
@@ -10,81 +9,97 @@
                     <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
                         <i class="material-icons">search</i>
                     </label>
-    
+
                     <div class="mdl-textfield__expandable-holder">
-                        <input class="mdl-textfield__input" type="text" id="search" (keyup.enter)="searchData()" [(ngModel)]="search.textSearch"/>
+                        <input class="mdl-textfield__input" type="text" id="search" (keyup.enter)="searchData()"
+                            [(ngModel)]="search.textSearch" />
                         <label class="mdl-textfield__label" for="search">Tìm kiếm...</label>
                     </div>
                 </div>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end" (click)="openEditForm()">
+                <button
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end"
+                    (click)="openEditForm()">
                     <i class="material-icons">add_circle</i>
                     Thêm mới
                 </button>
             </div>
             <table class="mdl-data-table mdl-js-data-table bordered-table w-100">
                 <thead>
-                <tr>
-                    <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
-                    <th class="mdl-data-table__cell--non-numeric">Tên gói thầu</th>
-                    <th class="mdl-data-table__cell--non-numeric w-50px">Thao tác</th>
-                </tr>
+                    <tr>
+                        <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
+                        <th class="mdl-data-table__cell--non-numeric">Tên gói thầu</th>
+                        <th class="mdl-data-table__cell--non-numeric w-50px">Thao tác</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr *ngFor="let item of biddingPackage; let i = index">
-                    <td class="mdl-data-table__cell--non-numeric text-center">{{((search.pageIndex - 1) * search.pageSize) + i + 1}}</td>
-                    <td class="mdl-data-table__cell--non-numeric">{{item.biddingPackageName}}</td>
-                    <td class="mdl-data-table__cell--non-numeric w-50px text-center">
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openEditForm(item.biddingPackageId)">
-                            <i class="material-icons">create</i>
-                            Sửa
-                        </button>
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red" (click)="openDeleteForm(item.biddingPackageId)">
-                            <i class="material-icons">delete</i>
-                            Xóa
-                        </button>
-                    </td>
-                </tr>
+                    <tr *ngFor="let item of biddingPackage; let i = index">
+                        <td class="mdl-data-table__cell--non-numeric text-center">{{((search.pageIndex - 1) *
+                            search.pageSize) + i + 1}}</td>
+                        <td class="mdl-data-table__cell--non-numeric">{{item.biddingPackageName}}</td>
+                        <td class="mdl-data-table__cell--non-numeric w-50px text-center">
+                            <button
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20"
+                                (click)="openEditForm(item.biddingPackageId)">
+                                <i class="material-icons">create</i>
+                                Sửa
+                            </button>
+                            <button
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red"
+                                (click)="openDeleteForm(item.biddingPackageId)">
+                                <i class="material-icons">delete</i>
+                                Xóa
+                            </button>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
-            <p-paginator [rows]="search.pageSize" [totalRecords]="totalData" (onPageChange)="onPageChange($event)"></p-paginator>
+            <p-paginator [rows]="search.pageSize" [totalRecords]="totalData" (onPageChange)="onPageChange($event)">
+            </p-paginator>
         </div>
     </div>
 </div>
 
 
-<p-dialog [header]="biddingPackageId ? 'Chỉnh sửa gói thầu' : 'Thêm mới gói thầu'" [(visible)]="isShowModal" [modal]="true" [style]="{width: '70vw'}"
-    [draggable]="false" [resizable]="false">
-        <form (ngSubmit)="onSubmit()" [formGroup]="packageForm">
-            <div class="form-group">
-                <label class="col-lg-12 lh-30px">Tên gói thầu<span class="text-danger">*</span></label>
-                <div class="col-lg-12">
-                    <input type="text" pInputText formControlName="biddingPackageName" placeholder="Tên gói thầu..." class="w-100"/>
-                    <div class="error pl-0" *ngIf="(form.biddingPackageName.touched || isSubmit)">
-                        <p class="text-danger" *ngIf="form.biddingPackageName.errors?.required">Tên gói thầu không thể để trống</p>
+<p-dialog [header]="biddingPackageId ? 'Chỉnh sửa gói thầu' : 'Thêm mới gói thầu'" [(visible)]="isShowModal"
+    [modal]="true" [style]="{width: '30vw'}" [draggable]="false" [resizable]="false">
+    <form (ngSubmit)="onSubmit()" [formGroup]="packageForm">
+        <div class="form-group">
+            <label class="col-lg-12 lh-30px">Tên gói thầu<span class="text-danger">*</span></label>
+            <div class="col-lg-12">
+                <input type="text" pInputText formControlName="biddingPackageName" placeholder="Tên gói thầu..."
+                    class="w-100" />
+                <div class="error pl-0" *ngIf="(form.biddingPackageName.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.biddingPackageName.errors?.required">Tên gói thầu không thể để
+                        trống</p>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="form-group mt-2">
+            <label class="col-lg-12 lh-30px">Danh sách văn bản</label>
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-4" *ngFor="let item of documents">
+                        <p-checkbox [value]="item.documentId" binary="true" name="groupname"
+                             [label]="item.documentName" [(ngModel)]="documentSelected"></p-checkbox>
                     </div>
                 </div>
             </div>
-            <div class="form-group mt-2">
-                <label class="col-lg-12 lh-30px">Danh sách văn bản</label>
-                <div class="col-lg-12">
-                    <div class="row">
-                        <div class="col-lg-4" *ngFor="let item of documents">
-                            <p-checkbox formControlName="documentIds"></p-checkbox> {{item.documentName}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group float-end pt-3 pb-3">
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue mr-10" title="Lưu" type="submit">
-                    <i class="material-icons">check</i>
-                    Lưu
-                </button>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-light" title="Đóng" (click)="isShowModal=false">
-                    <i class="material-icons">close</i>
-                    Đóng
-                </button>
-            </div>
-        </form>
+        </div> -->
+        <div class="form-group float-end pt-3 pb-3">
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue mr-10"
+                title="Lưu" type="submit">
+                <i class="material-icons">check</i>
+                Lưu
+            </button>
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-light"
+                title="Đóng" (click)="isShowModal=false">
+                <i class="material-icons">close</i>
+                Đóng
+            </button>
+        </div>
+    </form>
 </p-dialog>
 
 <p-confirmDialog header="" icon="pi pi-exclamation-triangle"></p-confirmDialog>

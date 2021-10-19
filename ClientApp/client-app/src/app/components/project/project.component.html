@@ -40,6 +40,10 @@
                     <td class="mdl-data-table__cell--non-numeric">{{item.note}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.currentState}}</td>
                     <td class="mdl-data-table__cell--non-numeric w-50px text-center">
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" [routerLink]="'/project-flow/' + item.projectId">
+                            <i class="material-icons">build_circle</i>
+                            Thực thi
+                        </button>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openEditForm(item.projectId)">
                             <i class="material-icons">create</i>
                             Sửa

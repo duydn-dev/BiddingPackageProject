@@ -26,7 +26,12 @@ export class MenuLeftComponent implements OnInit {
       {
         name: "Gói thầu",
         link: "/bidding-package",
-        icon: "cases",
+        icon: "inventory_2",
+      },
+      {
+        name: "Văn bản",
+        link: "/document",
+        icon: "description",
       },
       // {
       //   name: "Phòng họp",
@@ -51,9 +56,9 @@ export class MenuLeftComponent implements OnInit {
         $(this).children('.sub-navigation-item').children('.mdl-navigation__link').removeClass("mdl-navigation__link--current")
       }
     })
-    if($(e.target).next().attr('class') == "mdl-navigation"){
-      $(e.target).parent().parent().toggleClass('sub-navigation--show');
+    if($(e.target).next().attr('class') === "mdl-navigation"){
       $(e.target).toggleClass('mdl-navigation__link--current');
+      $(e.target).parent().parent().toggleClass('sub-navigation--show');
     }
   }
 }

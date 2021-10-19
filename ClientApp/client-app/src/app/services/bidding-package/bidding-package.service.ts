@@ -17,6 +17,12 @@ export class BiddingService {
   getById(biddingPackageId:any){
     return this._baseService.get("api/biddingpackage/with-document", biddingPackageId);
   }
+  getDropdown(){
+    return this._baseService.get("api/biddingpackage/dropdown");
+  }
+  getPackageProjectId(projectId:any){
+    return this._baseService.get("api/biddingpackage/dropdown-by-project", projectId)
+  }
   create(biddingPackage:any){
     return this._baseService.post("api/biddingpackage/create", biddingPackage);
   }

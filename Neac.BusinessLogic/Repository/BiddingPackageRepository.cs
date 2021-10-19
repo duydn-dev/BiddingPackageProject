@@ -80,36 +80,36 @@ namespace Neac.BusinessLogic.Repository
                 return Response<BiddingPackageByIdDto>.CreateErrorResponse(ex);
             }
         }
-        public async Task<Response<BiddingPackageDto>> CreateAsync(BiddingPackageDto request)
+        public async Task<Response<BiddingPackageByIdDto>> CreateAsync(BiddingPackageByIdDto request)
         {
             try
             {
                 request.BiddingPackageId = Guid.NewGuid();
-                var mappped = _mapper.Map<BiddingPackageDto, BiddingPackage>(request);
+                var mappped = _mapper.Map<BiddingPackageByIdDto, BiddingPackage>(request);
                 await _unitOfWork.GetRepository<BiddingPackage>().Add(mappped);
                 await _unitOfWork.SaveAsync();
-                return Response<BiddingPackageDto>.CreateSuccessResponse(request);
+                return Response<BiddingPackageByIdDto>.CreateSuccessResponse(request);
             }
             catch (Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
-                return Response<BiddingPackageDto>.CreateErrorResponse(ex);
+                return Response<BiddingPackageByIdDto>.CreateErrorResponse(ex);
             }
         }
-        public async Task<Response<BiddingPackageDto>> UpdateAsync(BiddingPackageDto request)
+        public async Task<Response<BiddingPackageByIdDto>> UpdateAsync(BiddingPackageByIdDto request)
         {
             try
             {
                 var BiddingPackage = await _unitOfWork.GetRepository<BiddingPackage>().GetByExpression(n => n.BiddingPackageId == request.BiddingPackageId).FirstOrDefaultAsync();
-                var mappped = _mapper.Map<BiddingPackageDto, BiddingPackage>(request, BiddingPackage);
+                var mappped = _mapper.Map<BiddingPackageByIdDto, BiddingPackage>(request, BiddingPackage);
                 await _unitOfWork.GetRepository<BiddingPackage>().Update(mappped);
                 await _unitOfWork.SaveAsync();
-                return Response<BiddingPackageDto>.CreateSuccessResponse(request);
+                return Response<BiddingPackageByIdDto>.CreateSuccessResponse(request);
             }
             catch (Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
-                return Response<BiddingPackageDto>.CreateErrorResponse(ex);
+                return Response<BiddingPackageByIdDto>.CreateErrorResponse(ex);
             }
         }
         public async Task<Response<bool>> DeleteAsync(Guid BiddingPackageId)
@@ -124,6 +124,43 @@ namespace Neac.BusinessLogic.Repository
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<bool>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<List<BiddingPackageByIdDto>>> GetDropdownAsync()
+        {
+            try
+            {
+                var biddingPackages = await _unitOfWork.GetRepository<BiddingPackage>().GetAll().Include(n => n.Documents).ToListAsync();
+                var mappped = _mapper.Map<List<BiddingPackage>, List<BiddingPackageByIdDto>>(biddingPackages);
+                return Response<List<BiddingPackageByIdDto>>.CreateSuccessResponse(mappped);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<List<BiddingPackageByIdDto>>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<List<BiddingPackageDto>>> GetDropdownByProjectAsync(Guid projectId)
+        {
+            try
+            {
+                var biddingPackages = await (from bdp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
+                         join b in _unitOfWork.GetRepository<BiddingPackage>().GetAll() on bdp.BiddingPackageId equals b.BiddingPackageId
+                         where bdp.ProjectId == projectId
+                         orderby bdp.Order ascending
+                         select new BiddingPackageDto {
+                             BiddingPackageId = b.BiddingPackageId,
+                             BiddingPackageName = b.BiddingPackageName,
+                             Order = bdp.Order
+                         }).ToListAsync();
+                return Response<List<BiddingPackageDto>>.CreateSuccessResponse(biddingPackages);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<List<BiddingPackageDto>>.CreateErrorResponse(ex);
             }
         }
     }

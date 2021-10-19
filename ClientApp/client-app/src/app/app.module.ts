@@ -24,6 +24,8 @@ import {TreeModule} from 'primeng/tree';
 import {CalendarModule} from 'primeng/calendar';
 import {InputTextareaModule} from 'primeng/inputtextarea';
 import {CheckboxModule} from 'primeng/checkbox';
+import {OrderListModule} from 'primeng/orderlist';
+import {StepsModule} from 'primeng/steps';
 
 // component
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -37,6 +39,7 @@ import { ProjectComponent } from './components/project/project.component';
 import { DecentralizationComponent } from './components/users/decentralization/decentralization.component';
 import { BiddingPackageComponent } from './components/bidding-package/bidding-package.component';
 import { DocumentComponent } from './components/document/document.component';
+import { ProjectFlowComponent } from './components/project-flow/project-flow.component';
 
 
 @NgModule({
@@ -52,6 +55,7 @@ import { DocumentComponent } from './components/document/document.component';
     DecentralizationComponent,
     BiddingPackageComponent,
     DocumentComponent,
+    ProjectFlowComponent,
   ],
   imports: [
     BrowserModule,
@@ -72,6 +76,8 @@ import { DocumentComponent } from './components/document/document.component';
     CalendarModule,
     InputTextareaModule,
     CheckboxModule,
+    OrderListModule,
+    StepsModule,
     StoreModule.forRoot(reducers, {metaReducers})
   ],
   providers: [

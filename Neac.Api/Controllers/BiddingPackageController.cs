@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neac.Api.Attributes;
 using Neac.BusinessLogic.Contracts;
@@ -30,6 +31,21 @@ namespace Neac.Api.Controllers
             return await _biddingPackageRepository.GetFilter(filter);
         }
 
+        [Route("dropdown")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<Response<List<BiddingPackageByIdDto>>> GetDropdownAsync()
+        {
+            return await _biddingPackageRepository.GetDropdownAsync();
+        }
+        [Route("dropdown-by-project/{projectId}")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<Response<List<BiddingPackageDto>>> GetDropdownByProjectAsync(Guid projectId)
+        {
+            return await _biddingPackageRepository.GetDropdownByProjectAsync(projectId);
+        }
+
         [Route("{packageId}")]
         [HttpGet]
         [RoleDescription("Xem chi tiết gói thầu")]
@@ -49,14 +65,14 @@ namespace Neac.Api.Controllers
         [Route("create")]
         [HttpPost]
         [RoleDescription("Thêm mới gói thầu")]
-        public async Task<Response<BiddingPackageDto>> CreateAsync(BiddingPackageDto request)
+        public async Task<Response<BiddingPackageByIdDto>> CreateAsync(BiddingPackageByIdDto request)
         {
             return await _biddingPackageRepository.CreateAsync(request);
         }
         [Route("update/{packageId}")]
         [HttpPut]
         [RoleDescription("Cập nhật gói thầu")]
-        public async Task<Response<BiddingPackageDto>> UpdateAsync([FromRoute] Guid packageId, BiddingPackageDto request)
+        public async Task<Response<BiddingPackageByIdDto>> UpdateAsync([FromRoute] Guid packageId, BiddingPackageByIdDto request)
         {
             request.BiddingPackageId = packageId;
             return await _biddingPackageRepository.UpdateAsync(request);
