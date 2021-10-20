@@ -1,4 +1,5 @@
 ﻿using Neac.Common.Dtos;
+using Neac.Common.Dtos.ProjectDtos;
 using Neac.DataAccess;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,6 @@ namespace Neac.BusinessLogic.Contracts
         Task<Response<GetListResponseModel<List<ProjectFlow>>>> GetFilterAsync(string filter);
         Task<Response<ProjectFlow>> CreateAsync(ProjectFlow request);
         Task<Response<ProjectFlow>> UpdateAsync(ProjectFlow request);
+        Task<Response<List<ProjectFlowCurrentDto>>> CurrentState(Guid projectId);
     }
 }

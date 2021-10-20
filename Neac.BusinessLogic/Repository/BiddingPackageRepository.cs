@@ -146,6 +146,7 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                // lấy ra số văn bản đã thêm + tổng số văn bản trong bảng flow
                 var biddingPackages = await (from bdp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
                          join b in _unitOfWork.GetRepository<BiddingPackage>().GetAll() on bdp.BiddingPackageId equals b.BiddingPackageId
                          where bdp.ProjectId == projectId

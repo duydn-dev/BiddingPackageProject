@@ -24,6 +24,7 @@ namespace Neac.DataAccess
         public int? Status { get; set; }
 
         public Guid? BiddingPackageId { get; set; }
+        public Guid? ProjectId { get; set; }
         public Guid? DocumentId { get; set; }
     }
 }

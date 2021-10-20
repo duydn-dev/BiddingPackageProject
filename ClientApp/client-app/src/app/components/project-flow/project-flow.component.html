@@ -31,26 +31,26 @@
                         <div class="mt-4">
                             <button
                                 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end mb-2"
-                                (click)="openCreatePackageForm()">
+                                (click)="openCreateDocumentForm()">
                                 <i class="material-icons">add_circle</i>
                                 Thêm văn bản
                             </button>
                         </div>
                         <table class="mdl-data-table mdl-js-data-table bordered-table w-100 mt-2">
                             <thead>
-                            <tr>
-                                <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
-                                <th class="mdl-data-table__cell--non-numeric text-center">Tên văn bản</th>
-                                <th class="mdl-data-table__cell--non-numeric text-center">Người ký</th>
-                                <th class="mdl-data-table__cell--non-numeric text-center">Ngày ký</th>
-                                <th class="mdl-data-table__cell--non-numeric text-center">Số văn bản</th>
-                                <th class="mdl-data-table__cell--non-numeric text-center">Tình trạng</th>
-                                <th class="mdl-data-table__cell--non-numeric text-center">File đính kèm</th>
-                                <th class="mdl-data-table__cell--non-numeric w-50px text-center">Thao tác</th>
-                            </tr>
+                                <tr>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">STT</th>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">Tên văn bản</th>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">Người ký</th>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">Ngày ký</th>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">Số văn bản</th>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">Tình trạng</th>
+                                    <th class="mdl-data-table__cell--non-numeric text-center">File đính kèm</th>
+                                    <th class="mdl-data-table__cell--non-numeric w-50px text-center">Thao tác</th>
+                                </tr>
                             </thead>
                             <tbody>
-                            <!-- <tr *ngFor="let item of users; let i = index">
+                                <!-- <tr *ngFor="let item of users; let i = index">
                                 <td class="mdl-data-table__cell--non-numeric text-center">{{i + 1}}</td>
                                 <td class="mdl-data-table__cell--non-numeric">{{item.numberPhone}}</td>
                                 <td class="mdl-data-table__cell--non-numeric w-50px text-center">
@@ -76,3 +76,133 @@
         </div>
     </div>
 </div>
+
+<!-- flow add document -->
+<p-dialog header="Thêm mới văn bản" [(visible)]="isShowModal" [modal]="true" [style]="{width: '70vw'}"
+    [draggable]="false" [resizable]="false">
+    <form (ngSubmit)="saveDocument()" [formGroup]="documentForm">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Văn bản <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <input type="text" pInputText formControlName="documentId" placeholder="Văn bản..."
+                                class="w-100" />
+                            <div class="error pl-0" *ngIf="(form.documentId.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.documentId.errors?.required">Văn bản không thể để
+                                    trống</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Số hiệu <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <input type="text" pInputText formControlName="documentNumber" placeholder="Số hiệu..."
+                                class="w-100" />
+                            <div class="error pl-0" *ngIf="(form.documentNumber.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.documentNumber.errors?.required">Số hiệu không thể để
+                                    trống</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Ngày tạo <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <input type="text" pInputText formControlName="projectDate" placeholder="Ngày tạo..."
+                                class="w-100" />
+                            <div class="error pl-0" *ngIf="(form.projectDate.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.projectDate.errors?.required">Số hiệu không thể để
+                                    trống</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Đơn vị ban hành <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <input type="text" pInputText formControlName="promulgateUnit"
+                                placeholder="Đơn vị ban hành..." class="w-100" />
+                            <div class="error pl-0" *ngIf="(form.promulgateUnit.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.promulgateUnit.errors?.required">Đơn vị ban hành
+                                    không thể để trống</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Trích yếu </label>
+                        <div class="col-lg-12">
+                            <textarea pInputTextarea formControlName="documentAbstract" class="w-100"
+                                placeholder="Trích yếu..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Người ký <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <input type="text" pInputText formControlName="signer"
+                                placeholder="Người ký..." class="w-100" />
+                            <div class="error pl-0" *ngIf="(form.promulgateUnit.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.promulgateUnit.errors?.required">Người ký không thể để trống</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Văn bản quy định <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <input type="text" pInputText formControlName="signer"
+                                placeholder="Người ký..." class="w-100" />
+                            <div class="error pl-0" *ngIf="(form.promulgateUnit.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.promulgateUnit.errors?.required">Văn bản quy định không thể để trống</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">File đính kèm </label>
+                        <div class="col-lg-12">
+                            <input type="file" pInputText formControlName="fileUrl" id="fileUrl"
+                                placeholder="Người ký..." class="w-100 d-none" />
+                                <label for="fileUrl" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green">
+                                    <i class="material-icons">attach_file</i>
+                                    Tệp đính kèm
+                                </label>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Ghi chú </label>
+                        <div class="col-lg-12">
+                            <textarea pInputTextarea formControlName="note" class="w-100"
+                                placeholder="Trích yếu..."></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label class="col-lg-12 lh-30px">Tình trạng <span class="text-danger">*</span></label>
+                        <div class="col-lg-12">
+                            <p-checkbox name="groupname" value="0" formControlName="status" label="Chưa có"></p-checkbox>
+                            <p-checkbox name="groupname" class="pl-2" value="1" formControlName="status" label="Đã có"></p-checkbox>
+                            <p-checkbox name="groupname" class="pl-2" value="2" formControlName="status" label="Chỉnh sửa"></p-checkbox>
+
+                            <div class="error pl-0" *ngIf="(form.status.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.status.errors?.required">Văn bản quy định không thể để trống</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group float-end pt-3 pb-3">
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue mr-10"
+                title="Lưu" type="submit">
+                <i class="material-icons">check</i>
+                Lưu
+            </button>
+            <button
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--raised mdl-js-ripple-effect text-light"
+                title="Đóng" (click)="isShowModal=false">
+                <i class="material-icons">close</i>
+                Đóng
+            </button>
+        </div>
+    </form>
+</p-dialog>

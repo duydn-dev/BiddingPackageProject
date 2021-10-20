@@ -127,5 +127,19 @@ namespace Neac.BusinessLogic.Repository
                 return Response<bool>.CreateErrorResponse(ex);
             }
         }
+
+        public async Task<Response<List<Document>>> GetDropdownByPackageIdAsync(Guid packageId)
+        {
+            try
+            {
+                var documents = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.IsCommon.Value || n.BiddingPackageId == packageId).ToListAsync();
+                return Response<List<Document>>.CreateSuccessResponse(documents);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<List<Document>>.CreateErrorResponse(ex);
+            }
+        }
     }
 }

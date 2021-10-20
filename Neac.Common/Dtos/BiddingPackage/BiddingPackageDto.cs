@@ -19,4 +19,9 @@ namespace Neac.Common.Dtos.BiddingPackage
         public string BiddingPackageName { get; set; }
         public List<DocumentDto> Documents { get; set; }
     }
+    public class BiddingPackageTotalDocumentDto
+    {
+        public Guid? BiddingPackageId { get; set; }
+        public int? NumberDocument { get; set; }
+    }
 }

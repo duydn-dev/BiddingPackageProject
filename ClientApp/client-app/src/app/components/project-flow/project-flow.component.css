@@ -56,6 +56,9 @@ img {
 .pl-10px{
     padding-left: 10px;
 }
+.lh-30px{
+    line-height: 30px;
+}
 @media screen and (max-width: 576px) {
     .product-item {
         flex-wrap: wrap;

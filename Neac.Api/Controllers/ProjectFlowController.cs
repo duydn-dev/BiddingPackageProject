@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neac.Api.Attributes;
 using Neac.BusinessLogic.Contracts;
 using Neac.Common.Dtos;
+using Neac.Common.Dtos.ProjectDtos;
 using Neac.DataAccess;
 using System;
 using System.Collections.Generic;
@@ -29,6 +31,14 @@ namespace Neac.Api.Controllers
         public async Task<Response<GetListResponseModel<List<ProjectFlow>>>> GetFilterAsync(string filter)
         {
             return await _projectFlowRepository.GetFilterAsync(filter);
+        }
+        [Route("current-state/{projectId}")]
+        [HttpGet]
+        //[RoleDescription("Tình trạng hiện tại dự án")]
+        [AllowAnonymous]
+        public async Task<Response<List<ProjectFlowCurrentDto>>> CurrentState(Guid projectId)
+        {
+            return await _projectFlowRepository.CurrentState(projectId);
         }
 
         [Route("create")]
