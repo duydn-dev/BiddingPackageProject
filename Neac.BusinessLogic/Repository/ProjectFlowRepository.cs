@@ -119,7 +119,7 @@ namespace Neac.BusinessLogic.Repository
                 }
                 else
                 {
-                    var package = _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId);
+                    var package = await _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId).ToArrayAsync();
                     foreach (var item in package)
                     {
                         var countDocument = await _unitOfWork.GetRepository<Document>()

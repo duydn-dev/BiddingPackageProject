@@ -29,7 +29,7 @@ namespace Neac.Api.Controllers
         [Route("")]
         [HttpGet]
         [RoleDescription("Xem danh sách luồng dự án")]
-        public async Task<Response<List<ProjectFlow>>> GetFilterAsync(string filter)
+        public async Task<Response<List<ProjectFlow>>> GetFilterAsync([FromQuery]string filter)
         {
             return await _projectFlowRepository.GetFilterAsync(filter);
         }

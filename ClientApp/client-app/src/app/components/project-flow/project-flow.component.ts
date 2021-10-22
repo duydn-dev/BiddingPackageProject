@@ -22,6 +22,7 @@ export class ProjectFlowComponent implements OnInit {
   isSubmit:boolean = false;
   dropdownDocument:any = [];
   file:any = {};
+  document:any = [];
   get form() { return this.documentForm.controls; }
 
   constructor(
@@ -35,7 +36,6 @@ export class ProjectFlowComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.projectId = this.route.snapshot.paramMap.get('projectId');
-    this.getDropDownDocument();
     this.documentForm = this._fb.group({
       projectFlowId: this._fb.control(null),
       documentNumber: this._fb.control(null, [Validators.required]),
@@ -59,16 +59,15 @@ export class ProjectFlowComponent implements OnInit {
     this.documentForm.reset();
     this.isShowModal = true;
   }
-  getDropDownDocument(){
-    this._documentService.getDropDown().subscribe(response => {
-      if(response.success){
-        this.dropdownDocument = response.responseData;
-        this.dropdownDocument.unshift({
-          documentId: null,
-          documentName: '-- Chọn văn bản --'
-        })
-      }
-    })
+  async getDropDownDocument(){
+    const response = await this._documentService.getDropDownByPackage(this.currentPackage).toPromise();
+    if(response.success){
+      this.dropdownDocument = response.responseData;
+      this.dropdownDocument.unshift({
+        documentId: null,
+        documentName: '-- Chọn văn bản --'
+      })
+    }
   }
   onFileChange(event){
     if(event.target.files.length > 0)
@@ -77,6 +76,7 @@ export class ProjectFlowComponent implements OnInit {
   async getCurrentPackage(){
     const response = await this._flowService.currentPackage(this.projectId).toPromise();
     if(response.success){
+      console.log(response.responseData);
       this.currentPackage = response.responseData;
     }
   }
@@ -104,7 +104,8 @@ export class ProjectFlowComponent implements OnInit {
           order: temp.order,
           label: temp.label,
           command: (event: any) => {
-            this.activeIndex = temp.order;
+            this.activeIndex = (temp.order - 1);
+            this.currentPackage = n.biddingPackageId;
           }
         }
       }
@@ -112,10 +113,19 @@ export class ProjectFlowComponent implements OnInit {
       return a.order - b.order;
     })
     this.packages = mappedModel;
+    console.log(this.packages);
     const currentOrder = this.packages.find(n => n.biddingPackageId === this.currentPackage)
-    this.activeIndex = currentOrder;
+    this.activeIndex = (currentOrder?.order) ? 0 : currentOrder?.order - 1;
   }
-  saveDocument(){
+  async getFlows(){
+    const request = {
+      projectId: this.projectId,
+      biddingPackageId : this.currentPackage
+    }
+    const response = await this._flowService.getFlows(request).toPromise();
+    this.document = response.responseData;
+  }
+  async saveDocument(){
     this.isSubmit = true;
     if (this.documentForm.invalid) {
       return;
@@ -128,19 +138,21 @@ export class ProjectFlowComponent implements OnInit {
       console.log(this.documentForm.value)
     }
     else{
-      this._flowService.createFlow(this.file, request).subscribe(response => {
-        if(response.success){
-          this.isShowModal = false;
-          this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Thêm mới thành công !' });
-        }
-        else{
-          this._messageService.add({ severity: 'error', summary: 'Lỗi !', detail: 'Thêm mới thất bại !' });
-        }
-      })
+      const response = await this._flowService.createFlow(this.file, request).toPromise();
+      if(response.success){
+        await this.initData();
+        this.isShowModal = false;
+        this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Thêm mới thành công !' });
+      }
+      else{
+        this._messageService.add({ severity: 'error', summary: 'Lỗi !', detail: 'Thêm mới thất bại !' });
+      }
     }
   }
   async initData(){
     await this.getCurrentPackage();
     await this.projectCurrentState(await this.getPackageByProjectId());
+    await this.getFlows();
+    await this.getDropDownDocument();
   }
 }

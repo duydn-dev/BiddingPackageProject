@@ -28,7 +28,7 @@
                         </button>
                     </div>
                     <div class="col-lg-9">
-                        <p-steps [model]="packages"></p-steps>
+                        <p-steps [model]="packages" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
                         <div class="mt-4">
                             <button
                                 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end mb-2"
@@ -51,26 +51,23 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <tr *ngFor="let item of users; let i = index">
+                                <tr *ngFor="let item of document; let i = index">
                                 <td class="mdl-data-table__cell--non-numeric text-center">{{i + 1}}</td>
-                                <td class="mdl-data-table__cell--non-numeric">{{item.numberPhone}}</td>
+                                <td class="mdl-data-table__cell--non-numeric"></td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.signer}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.projectDate | date:"dd/MM/yyyy"}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.documentNumber}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.status}}</td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.fileUrl}}</td>
                                 <td class="mdl-data-table__cell--non-numeric w-50px text-center">
-                                    <a class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" [routerLink]="'/decentralization/' + item.userId">
-                                        <i class="material-icons">engineering</i>
-                                        Phân quyền
-                                    </a>
-                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openEditForm(item.userId)">
-                                        <i class="material-icons">create</i>
-                                        Sửa
-                                    </button>
-                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red" (click)="openDeleteForm(item.userId)">
-                                        <i class="material-icons">delete</i>
-                                        Xóa
-                                    </button>
+                                    
                                 </td>
-                            </tr> -->
+                            </tr>
                             </tbody>
                         </table>
+                        <div class="mt-2">
+                            <button class="btn btn-primary float-end">Next</button>
+                        </div>
                     </div>
                 </div>
             </div>
