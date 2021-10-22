@@ -31,4 +31,9 @@ namespace Neac.Common.Dtos.ProjectDtos
         public int? CurrentState { get; set; }
         public List<BiddingPackageProjectDto> BiddingPackageProjectDtos { get; set; }
     }
+    public class ProjectFlowGetListRequestDto
+    {
+        public Guid? ProjectId { get; set; }
+        public Guid? BiddingPackageId { get; set; }
+    }
 }

@@ -8,6 +8,7 @@ using Neac.Common.Dtos.ProjectDtos;
 using Neac.DataAccess;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,25 +29,31 @@ namespace Neac.Api.Controllers
         [Route("")]
         [HttpGet]
         [RoleDescription("Xem danh sách luồng dự án")]
-        public async Task<Response<GetListResponseModel<List<ProjectFlow>>>> GetFilterAsync(string filter)
+        public async Task<Response<List<ProjectFlow>>> GetFilterAsync(string filter)
         {
             return await _projectFlowRepository.GetFilterAsync(filter);
         }
         [Route("current-state/{projectId}")]
         [HttpGet]
-        //[RoleDescription("Tình trạng hiện tại dự án")]
         [AllowAnonymous]
-        public async Task<Response<List<ProjectFlowCurrentDto>>> CurrentState(Guid projectId)
+        public async Task<Response<List<ProjectFlowCurrentDto>>> CurrentStateAsync(Guid projectId)
         {
             return await _projectFlowRepository.CurrentState(projectId);
+        }
+        [Route("current-package/{projectId}")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<Response<Guid>> CurrentPackageAsync(Guid projectId)
+        {
+            return await _projectFlowRepository.CurrentPackageAsync(projectId);
         }
 
         [Route("create")]
         [HttpPost]
         [RoleDescription("Thêm mới luồng dự án")]
-        public async Task<Response<ProjectFlow>> CreateAsync(ProjectFlow request)
+        public async Task<Response<ProjectFlow>> CreateAsync()
         {
-            return await _projectFlowRepository.CreateAsync(request);
+            return await _projectFlowRepository.CreateAsync();
         }
 
         [Route("update/{projectFlowId}")]
@@ -56,6 +63,16 @@ namespace Neac.Api.Controllers
         {
             request.ProjectFlowId = projectFlowId;
             return await _projectFlowRepository.UpdateAsync(request);
+        }
+
+        [Route("download/{projectFlowId}")]
+        [HttpGet]
+        [RoleDescription("Tải xuống văn bản")]
+        public async Task<IActionResult> DownloadAsync([FromRoute] Guid projectFlowId)
+        {
+            var filePath = await _projectFlowRepository.DownloadAsync(projectFlowId);
+            byte[] bytes = System.IO.File.ReadAllBytes(filePath);
+            return File(bytes, "application/octet-stream", Path.GetFileName(filePath));
         }
     }
 }

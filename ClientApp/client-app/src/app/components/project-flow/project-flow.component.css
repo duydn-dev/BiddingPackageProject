@@ -59,6 +59,10 @@ img {
 .lh-30px{
     line-height: 30px;
 }
+::ng-deep .p-datepicker-group{
+    height: 250px;
+    overflow-y: scroll;
+}
 @media screen and (max-width: 576px) {
     .product-item {
         flex-wrap: wrap;

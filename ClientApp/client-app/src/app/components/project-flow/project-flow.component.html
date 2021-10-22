@@ -15,6 +15,7 @@
                                     </div>
                                     <div class="bd-highlight">
                                         <div class="package-name">{{item.label}}</div>
+                                        <small class="pl-10px"><span class="text-danger">{{item.currentNumberDocument +"/"+ item.totalDocument}}</span> văn bản đã nhập</small>
                                     </div>
                                 </div>
                             </div>
@@ -87,8 +88,7 @@
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">Văn bản <span class="text-danger">*</span></label>
                         <div class="col-lg-12">
-                            <input type="text" pInputText formControlName="documentId" placeholder="Văn bản..."
-                                class="w-100" />
+                            <p-dropdown [options]="dropdownDocument" formControlName="documentId" optionLabel="documentName" optionValue="documentId" styleClass="w-100"></p-dropdown>
                             <div class="error pl-0" *ngIf="(form.documentId.touched || isSubmit)">
                                 <p class="text-danger" *ngIf="form.documentId.errors?.required">Văn bản không thể để
                                     trống</p>
@@ -109,10 +109,9 @@
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">Ngày tạo <span class="text-danger">*</span></label>
                         <div class="col-lg-12">
-                            <input type="text" pInputText formControlName="projectDate" placeholder="Ngày tạo..."
-                                class="w-100" />
+                            <p-calendar formControlName="projectDate" [showIcon]="true" inputId="icon" dateFormat="dd/mm/yy" placeholder="Ngày tạo..." [showTime]="false" styleClass="w-100"></p-calendar>
                             <div class="error pl-0" *ngIf="(form.projectDate.touched || isSubmit)">
-                                <p class="text-danger" *ngIf="form.projectDate.errors?.required">Số hiệu không thể để
+                                <p class="text-danger" *ngIf="form.projectDate.errors?.required">Ngày tạo không thể để
                                     trống</p>
                             </div>
                         </div>
@@ -150,22 +149,22 @@
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">Văn bản quy định <span class="text-danger">*</span></label>
                         <div class="col-lg-12">
-                            <input type="text" pInputText formControlName="signer"
+                            <input type="text" pInputText formControlName="regulationDocument"
                                 placeholder="Người ký..." class="w-100" />
-                            <div class="error pl-0" *ngIf="(form.promulgateUnit.touched || isSubmit)">
-                                <p class="text-danger" *ngIf="form.promulgateUnit.errors?.required">Văn bản quy định không thể để trống</p>
+                            <div class="error pl-0" *ngIf="(form.regulationDocument.touched || isSubmit)">
+                                <p class="text-danger" *ngIf="form.regulationDocument.errors?.required">Văn bản quy định không thể để trống</p>
                             </div>
                         </div>
                     </div>
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">File đính kèm </label>
                         <div class="col-lg-12">
-                            <input type="file" pInputText formControlName="fileUrl" id="fileUrl"
-                                placeholder="Người ký..." class="w-100 d-none" />
-                                <label for="fileUrl" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green">
-                                    <i class="material-icons">attach_file</i>
-                                    Tệp đính kèm
-                                </label>
+                            <input type="file" pInputText id="fileUrl" (change)="onFileChange($event)" class="w-100 d-none" />
+                            <label for="fileUrl" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green">
+                                <i class="material-icons">attach_file</i>
+                                Tệp đính kèm
+                            </label>
+                            <p class="text-primary">{{file.name}}</p>
                         </div>
                     </div>
                     <div class="form-group mt-3">
@@ -178,9 +177,9 @@
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">Tình trạng <span class="text-danger">*</span></label>
                         <div class="col-lg-12">
-                            <p-checkbox name="groupname" value="0" formControlName="status" label="Chưa có"></p-checkbox>
-                            <p-checkbox name="groupname" class="pl-2" value="1" formControlName="status" label="Đã có"></p-checkbox>
-                            <p-checkbox name="groupname" class="pl-2" value="2" formControlName="status" label="Chỉnh sửa"></p-checkbox>
+                            <p-radioButton name="status" value="0" formControlName="status" label="Chưa có"></p-radioButton >
+                            <p-radioButton name="status" class="pl-10px" value="1" formControlName="status" label="Đã có"></p-radioButton >
+                            <p-radioButton name="status" class="pl-10px" value="2" formControlName="status" label="Chỉnh sửa"></p-radioButton >
 
                             <div class="error pl-0" *ngIf="(form.status.touched || isSubmit)">
                                 <p class="text-danger" *ngIf="form.status.errors?.required">Văn bản quy định không thể để trống</p>

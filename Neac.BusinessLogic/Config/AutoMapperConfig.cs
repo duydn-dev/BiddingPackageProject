@@ -53,6 +53,9 @@ namespace Neac.BusinessLogic.Config
             CreateMap<Document, DocumentDto>();
             CreateMap<DocumentDto, Document>()
                 .ForMember(n => n.BiddingPackage, g => g.Ignore());
+            
+            CreateMap<ProjectFlowCreateDto, ProjectFlow>();
+            CreateMap<ProjectFlow, ProjectFlowCreateDto>();
         }
     }
 }
