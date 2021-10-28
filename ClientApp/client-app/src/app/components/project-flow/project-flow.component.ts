@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { BiddingService } from 'src/app/services/bidding-package/bidding-package.service';
 import { DocumentService } from 'src/app/services/document/document.service';
 import { ProjectFlowService } from 'src/app/services/project-flow/project-flow.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-project-flow',
@@ -21,8 +22,11 @@ export class ProjectFlowComponent implements OnInit {
   documentForm:FormGroup;
   isSubmit:boolean = false;
   dropdownDocument:any = [];
-  file:any = {};
+  file:any = null;
   document:any = [];
+  documentImported: any = [];
+  isEnableCreate:boolean = true;
+  @ViewChild('inputFile') input: ElementRef;
   get form() { return this.documentForm.controls; }
 
   constructor(
@@ -55,28 +59,93 @@ export class ProjectFlowComponent implements OnInit {
   openCreatePackageForm() {
     
   }
-  openCreateDocumentForm(){
+  openCreateDocumentForm(flowId:any = null){
+    this.documentForm.clearValidators();
     this.documentForm.reset();
     this.isShowModal = true;
-  }
-  async getDropDownDocument(){
-    const response = await this._documentService.getDropDownByPackage(this.currentPackage).toPromise();
-    if(response.success){
-      this.dropdownDocument = response.responseData;
-      this.dropdownDocument.unshift({
-        documentId: null,
-        documentName: '-- Chọn văn bản --'
+    this.file = null;
+    this.input.nativeElement.value = null;
+    if(flowId){
+      this._flowService.getFlowById(flowId).subscribe(response => {
+        if(response.success){
+          this.file = {
+            name: this.getFileUrlv2(response.responseData.fileUrl)
+          };
+          this.documentForm.patchValue({
+            projectFlowId: response.responseData.projectFlowId,
+            documentNumber: response.responseData.documentNumber,
+            projectDate: new Date(response.responseData.projectDate),
+            promulgateUnit: response.responseData.documentAbstract,
+            documentAbstract: response.responseData.documentAbstract,
+            signer: response.responseData.signer,
+            regulationDocument: response.responseData.regulationDocument,
+            note: response.responseData.note,
+            status: response.responseData.status,
+            biddingPackageId: response.responseData.biddingPackageId,
+            projectId: response.responseData.projectId,
+            documentId: response.responseData.documentId
+          });
+        }
       })
     }
   }
+  getFileUrl(url){
+    return url.replace(/\d{14}./gm, ".");
+  }
+  getFileUrlv2(url){
+    let str = url.replace(/\d{14}./gm, ".");
+    return str.replace(/Uploads\\/gm, "");
+  }
+  downloadFile(projectFlowId){
+    var downloadURL = `${environment.apiUrl}/api/projectflow/download/${projectFlowId}`;
+    window.open(downloadURL); 
+  }
+  async getDropDownDocument(){
+    const request = {
+      packageId: this.currentPackage,
+      projectId: this.projectId
+    }
+    const response = await this._documentService.getDropDownByPackage(request).toPromise();
+    if(response.success){
+      response.responseData.unshift({
+        documentId: null,
+        documentName: '-- Chọn văn bản --'
+      })
+      if(response.otherData){
+        this.documentImported = response.otherData;
+        this.dropdownDocument = response.responseData.map(n => {
+          const str = this.isDisabledOption(n);
+          n.disabled = (str == 'disabled');
+          return n;
+        });
+        console.log(this.dropdownDocument);
+      }
+    }
+  }
+  isDisabledOption(option){
+    if(option.documentId){
+      const i = this.documentImported.findIndex(n => n == option.documentId);
+      return i === -1 ? "": "disabled";
+    }
+    return "";
+  }
+  // onSelecteDocument(event, option){
+  //   const str = this.isDisabledOption(option);
+  //   console.log(event);
+  //   if(str == 'disabled')
+  //     event.stopPropagation();
+  // }
   onFileChange(event){
     if(event.target.files.length > 0)
       this.file = event.target.files[0];
   }
+  enableCreate(){
+    const flow = this.packages.find(n => n.biddingPackageId == this.currentPackage);
+    this.isEnableCreate = (flow.currentNumberDocument == flow.totalDocument)
+  }
   async getCurrentPackage(){
     const response = await this._flowService.currentPackage(this.projectId).toPromise();
     if(response.success){
-      console.log(response.responseData);
       this.currentPackage = response.responseData;
     }
   }
@@ -103,9 +172,11 @@ export class ProjectFlowComponent implements OnInit {
           totalDocument: n.totalDocument,
           order: temp.order,
           label: temp.label,
-          command: (event: any) => {
+          command: async (event: any) => {
             this.activeIndex = (temp.order - 1);
             this.currentPackage = n.biddingPackageId;
+            this.enableCreate();
+            await this.getFlows();
           }
         }
       }
@@ -113,9 +184,8 @@ export class ProjectFlowComponent implements OnInit {
       return a.order - b.order;
     })
     this.packages = mappedModel;
-    console.log(this.packages);
     const currentOrder = this.packages.find(n => n.biddingPackageId === this.currentPackage)
-    this.activeIndex = (currentOrder?.order) ? 0 : currentOrder?.order - 1;
+    this.activeIndex = !currentOrder ? 0 : (currentOrder.order - 1)
   }
   async getFlows(){
     const request = {
@@ -141,11 +211,12 @@ export class ProjectFlowComponent implements OnInit {
       const response = await this._flowService.createFlow(this.file, request).toPromise();
       if(response.success){
         await this.initData();
+        this.isSubmit = false;
         this.isShowModal = false;
         this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Thêm mới thành công !' });
       }
       else{
-        this._messageService.add({ severity: 'error', summary: 'Lỗi !', detail: 'Thêm mới thất bại !' });
+        this._messageService.add({ severity: 'error', summary: 'Lỗi !', detail: response.message });
       }
     }
   }
@@ -154,5 +225,6 @@ export class ProjectFlowComponent implements OnInit {
     await this.projectCurrentState(await this.getPackageByProjectId());
     await this.getFlows();
     await this.getDropDownDocument();
+    this.enableCreate();
   }
 }

@@ -12,16 +12,22 @@ namespace Neac.Common.Dtos
         public bool Success { get; set; }
         public int StatusCode { get; set; }
         public string Message { get; set; }
-        public Response(bool success, int statusCode, string message, T data)
+        public object OtherData { get; set; }
+        public Response(bool success, int statusCode, string message, T data, object otherData = null)
         {
             Success = success;
             StatusCode = statusCode;
             Message = message;
             ResponseData = data;
+            OtherData = otherData;
         }
         public static Response<T> CreateSuccessResponse(T data)
         {
             return new Response<T>(true, 200, "success !", data);
+        }
+        public static Response<T> CreateSuccessResponse(T data, object otherData)
+        {
+            return new Response<T>(true, 200, "success !", data, otherData);
         }
         public static Response<T> CreateErrorResponse(Exception exception = null)
         {

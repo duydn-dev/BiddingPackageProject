@@ -15,22 +15,29 @@
                                     </div>
                                     <div class="bd-highlight">
                                         <div class="package-name">{{item.label}}</div>
-                                        <small class="pl-10px"><span class="text-danger">{{item.currentNumberDocument +"/"+ item.totalDocument}}</span> văn bản đã nhập</small>
+                                        <small class="pl-10px" *ngIf="item.currentNumberDocument == item.totalDocument">
+                                            <span class="text-success">
+                                                <span class="material-icons" style="font-size: 16px;">check_circle</span>
+                                            </span>
+                                        </small>
+                                        <small class="pl-10px" *ngIf="item.currentNumberDocument != item.totalDocument">
+                                            <span class="text-danger">{{item.currentNumberDocument +"/"+ item.totalDocument}}</span> văn bản đã nhập</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button
+                        <!-- <button
                             class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue"
                             (click)="openCreatePackageForm()">
                             <i class="material-icons">add_circle</i>
                             Thêm gói thầu
-                        </button>
+                        </button> -->
                     </div>
                     <div class="col-lg-9">
                         <p-steps [model]="packages" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
                         <div class="mt-4">
                             <button
+                                [disabled]="isEnableCreate"
                                 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end mb-2"
                                 (click)="openCreateDocumentForm()">
                                 <i class="material-icons">add_circle</i>
@@ -53,21 +60,25 @@
                             <tbody>
                                 <tr *ngFor="let item of document; let i = index">
                                 <td class="mdl-data-table__cell--non-numeric text-center">{{i + 1}}</td>
-                                <td class="mdl-data-table__cell--non-numeric"></td>
+                                <td class="mdl-data-table__cell--non-numeric">{{item.documentName}}</td>
                                 <td class="mdl-data-table__cell--non-numeric">{{item.signer}}</td>
                                 <td class="mdl-data-table__cell--non-numeric">{{item.projectDate | date:"dd/MM/yyyy"}}</td>
                                 <td class="mdl-data-table__cell--non-numeric">{{item.documentNumber}}</td>
-                                <td class="mdl-data-table__cell--non-numeric">{{item.status}}</td>
-                                <td class="mdl-data-table__cell--non-numeric">{{item.fileUrl}}</td>
+                                <td class="mdl-data-table__cell--non-numeric" *ngIf="item.status == 0">Chưa có</td>
+                                <td class="mdl-data-table__cell--non-numeric" *ngIf="item.status == 1">Đã có</td>
+                                <td class="mdl-data-table__cell--non-numeric" *ngIf="item.status == 2">Chỉnh sửa</td>
+                                <td class="mdl-data-table__cell--non-numeric">
+                                    <a (click)="downloadFile(item.projectFlowId)" class="text-primary currsor-pointer">{{ getFileUrlv2(item.fileUrl) }}</a>
+                                </td>
                                 <td class="mdl-data-table__cell--non-numeric w-50px text-center">
-                                    
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange" (click)="openCreateDocumentForm(item.projectFlowId)">
+                                        <i class="material-icons">create</i>
+                                        Sửa
+                                    </button>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
-                        <div class="mt-2">
-                            <button class="btn btn-primary float-end">Next</button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -85,7 +96,21 @@
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">Văn bản <span class="text-danger">*</span></label>
                         <div class="col-lg-12">
-                            <p-dropdown [options]="dropdownDocument" formControlName="documentId" optionLabel="documentName" optionValue="documentId" styleClass="w-100"></p-dropdown>
+                            <p-dropdown 
+                                [options]="dropdownDocument" 
+                                formControlName="documentId" 
+                                optionLabel="documentName" 
+                                optionValue="documentId" 
+                                styleClass="w-100" 
+                                optionDisabled="disabled">
+                            </p-dropdown>
+                            <!-- <p-dropdown [options]="dropdownDocument" formControlName="documentId" optionLabel="documentName" optionValue="documentId" styleClass="w-100">
+                                <ng-template let-option pTemplate="item">
+                                    <div>
+                                        <div (click)="onSelecteDocument($event, option)" [ngClass]="isDisabledOption(option)"> {{option.documentName}} </div>
+                                    </div>
+                                </ng-template>
+                            </p-dropdown> -->
                             <div class="error pl-0" *ngIf="(form.documentId.touched || isSubmit)">
                                 <p class="text-danger" *ngIf="form.documentId.errors?.required">Văn bản không thể để
                                     trống</p>
@@ -156,12 +181,13 @@
                     <div class="form-group mt-3">
                         <label class="col-lg-12 lh-30px">File đính kèm </label>
                         <div class="col-lg-12">
-                            <input type="file" pInputText id="fileUrl" (change)="onFileChange($event)" class="w-100 d-none" />
+                            <input type="file" pInputText id="fileUrl" #inputFile (change)="onFileChange($event)" class="w-100 d-none" />
                             <label for="fileUrl" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-green">
                                 <i class="material-icons">attach_file</i>
                                 Tệp đính kèm
                             </label>
-                            <p class="text-primary">{{file.name}}</p>
+                            {{file}}
+                            <p class="text-primary">{{file?.name}}</p>
                         </div>
                     </div>
                     <div class="form-group mt-3">

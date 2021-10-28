@@ -38,13 +38,29 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                var projectFlow = JsonConvert.DeserializeObject<ProjectFlowCreateDto>(_httpContextAccessor.HttpContext.Request.Form["projectFlow"].ToString());
+                projectFlow.ProjectDate = projectFlow.ProjectDate.Value.AddDays(1);
+                var countDocumennt = await (from b in _unitOfWork.GetRepository<BiddingPackage>().GetAll()
+                        join d in _unitOfWork.GetRepository<Document>().GetAll() on b.BiddingPackageId equals d.BiddingPackageId
+                        where b.BiddingPackageId == projectFlow.BiddingPackageId
+                        group b by b.BiddingPackageId into gr
+                        select gr.Count()).FirstOrDefaultAsync();
+
+                var commondocumentCount = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.IsCommon.Value && n.BiddingPackageId == null).CountAsync();
+                var countCurrentDocument = await _unitOfWork.GetRepository<ProjectFlow>().GetAll()
+                    .Where(n => n.ProjectId == projectFlow.ProjectId && n.BiddingPackageId == projectFlow.BiddingPackageId)
+                    .CountAsync();
+                if((countDocumennt + commondocumentCount) == countCurrentDocument)
+                {
+                    return Response<ProjectFlow>.CreateErrorResponse(new Exception($"Đã đủ văn bản trong gói thầu"));
+                }
+
                 var file = _httpContextAccessor.HttpContext.Request.Form.Files[0];
                 string filePath = null;
                 if (file != null)
                 {
                     filePath = await UploadFile(file);
                 }
-                var projectFlow = JsonConvert.DeserializeObject<ProjectFlowCreateDto>(_httpContextAccessor.HttpContext.Request.Form["projectFlow"].ToString());
                 projectFlow.ProjectFlowId = Guid.NewGuid();
                 projectFlow.FileUrl = filePath;
                 var request = _mapper.Map<ProjectFlowCreateDto, ProjectFlow>(projectFlow);
@@ -62,22 +78,27 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
-                var documents = _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null);
-                var comonQuery = _unitOfWork.GetRepository<BiddingPackage>().GetAll()
-                  .Include(n => n.BiddingPackageProjects.OrderBy(g => g.Order))
-                  .Include(n => n.Documents)
-                  .Where(n => n.BiddingPackageProjects.Any(n => n.ProjectId == projectId));
+                var documents = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null && n.IsCommon.Value).CountAsync();
+                var q1 = from bdp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
+                          join d in _unitOfWork.GetRepository<Document>().GetAll() on bdp.BiddingPackageId equals d.BiddingPackageId into grDoc from grData in grDoc.DefaultIfEmpty()
+                          where bdp.ProjectId == projectId
+                          select new { BiddingPackageId = bdp.BiddingPackageId, DocumentId = (grData == null) ? Guid.Empty: grData.DocumentId };
 
-                var query = await _unitOfWork.GetRepository<BiddingPackage>().GetAll()
-                .Include(n => n.BiddingPackageProjects.OrderBy(g => g.Order))
-                .Include(n => n.Documents)
-                .Where(n => n.BiddingPackageProjects.Any(n => n.ProjectId == projectId))
-                .Select(n => new BiddingPackageTotalDocumentDto
-                {
-                    BiddingPackageId = n.BiddingPackageId,
-                    NumberDocument = n.Documents.Count + documents.Count()
-                })
-                .ToListAsync();
+                var query = await (q1.GroupBy(n => n.BiddingPackageId, (key, data) => new {
+                    BiddingPackageId = key,
+                    NumberDocument = data.Count(g => g.DocumentId != Guid.Empty) + documents
+                })).ToListAsync();
+
+                //var query = await _unitOfWork.GetRepository<BiddingPackage>().GetAll()
+                //.Include(n => n.BiddingPackageProjects.OrderBy(g => g.Order))
+                //.Include(n => n.Documents)
+                //.Where(n => n.BiddingPackageProjects.Any(n => n.ProjectId == projectId))
+                //.Select(n => new BiddingPackageTotalDocumentDto
+                //{
+                //    BiddingPackageId = n.BiddingPackageId,
+                //    NumberDocument = n.Documents.Count + documents
+                //})
+                //.ToListAsync();
 
                 var data = query.GroupJoin(
                     _unitOfWork.GetRepository<ProjectFlow>().GetAll(),
@@ -119,7 +140,7 @@ namespace Neac.BusinessLogic.Repository
                 }
                 else
                 {
-                    var package = await _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId).ToArrayAsync();
+                    var package = await _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId).OrderBy(n => n.Order).ToArrayAsync();
                     foreach (var item in package)
                     {
                         var countDocument = await _unitOfWork.GetRepository<Document>()
@@ -128,14 +149,15 @@ namespace Neac.BusinessLogic.Repository
                         var countCurrentDocument = await _unitOfWork.GetRepository<ProjectFlow>()
                             .GetByExpression(n => n.ProjectId == projectId && n.BiddingPackageId == item.BiddingPackageId)
                             .CountAsync();
-                        if (countDocument <= countCurrentDocument)
+                        if (countCurrentDocument == countDocument)
+                        {
+                            continue;
+                        }
+                        else if(countCurrentDocument < countDocument)
                         {
                             currentPackageId = item.BiddingPackageId.Value;
                             break;
                         }
-                        else
-                            continue;
-
                     }
                     return Response<Guid>.CreateSuccessResponse(currentPackageId);
                 }
@@ -147,22 +169,50 @@ namespace Neac.BusinessLogic.Repository
             }
         }
 
-        public async Task<Response<List<ProjectFlow>>> GetFilterAsync(string filter)
+        public async Task<Response<List<ProjectFlowGetListDto>>> GetFilterAsync(string filter)
         {
             try
             {
                 var request = JsonConvert.DeserializeObject<ProjectFlowGetListRequestDto>(filter);
-                var query = await _unitOfWork.GetRepository<ProjectFlow>()
-                    .GetByExpression(n =>
-                        n.ProjectId == request.ProjectId &&
-                        n.BiddingPackageId == request.BiddingPackageId
-                        ).ToListAsync();
-                return Response<List<ProjectFlow>>.CreateSuccessResponse(query);
+                var query = await (from pl in _unitOfWork.GetRepository<ProjectFlow>().GetAll()
+                               join d in _unitOfWork.GetRepository<Document>().GetAll() on pl.DocumentId equals d.DocumentId
+                               where pl.ProjectId == request.ProjectId && pl.BiddingPackageId == request.BiddingPackageId
+                               select new ProjectFlowGetListDto
+                               {
+                                   BiddingPackageId = pl.BiddingPackageId,
+                                   ProjectId = pl.ProjectId,
+                                   DocumentId = pl.DocumentId,
+                                   DocumentAbstract = pl.DocumentAbstract,
+                                   DocumentName = d.DocumentName,
+                                   DocumentNumber = pl.DocumentNumber,
+                                   FileUrl = pl.FileUrl,
+                                   Note = pl.Note,
+                                   ProjectDate = pl.ProjectDate,
+                                   ProjectFlowId = pl.ProjectFlowId,
+                                   PromulgateUnit = pl.PromulgateUnit,
+                                   RegulationDocument = pl.RegulationDocument,
+                                   Signer = pl.Signer,
+                                   Status = pl.Status
+                               }).ToListAsync();
+                return Response<List<ProjectFlowGetListDto>>.CreateSuccessResponse(query);
             }
             catch (Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
-                return Response<List<ProjectFlow>>.CreateErrorResponse(ex);
+                return Response<List<ProjectFlowGetListDto>>.CreateErrorResponse(ex);
+            }
+        }
+        public async Task<Response<ProjectFlow>> GetByIdAsync(Guid projectFlowId)
+        {
+            try
+            {
+                var query = await _unitOfWork.GetRepository<ProjectFlow>().GetByExpression(n => n.ProjectFlowId == projectFlowId).FirstOrDefaultAsync();
+                return Response<ProjectFlow>.CreateSuccessResponse(query);
+            }
+            catch (Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<ProjectFlow>.CreateErrorResponse(ex);
             }
         }
 

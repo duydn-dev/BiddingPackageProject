@@ -26,11 +26,11 @@ export class TokenInterceptor implements HttpInterceptor {
                 if (event instanceof HttpResponse) {
                     event = event.clone({ body: event.body })
                     if(event.status == 401){
-                        this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: "thời gian hoạt động đã hết, hệ thống sẽ tự chuyển hướng về trang đăng nhập !" });
+                        this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: "Phiên đăng nhập đã hết hạn, hệ thống sẽ tự chuyển hướng về trang đăng nhập !" });
                         setTimeout(() => {
                             this._store.dispatch(userActions.logout());
                             this._router.navigate(["/login"]);
-                        }, 3000);
+                        }, 2000);
                     }
                 }         
                 return event;

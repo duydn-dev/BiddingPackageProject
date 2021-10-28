@@ -41,11 +41,11 @@ namespace Neac.Api.Controllers
             return await _documentRepository.GetDropdownAsync();
         }
         [AllowAnonymous]
-        [Route("dropdown-by-packageid/{packageId}")]
-        [HttpGet]
-        public async Task<Response<List<Document>>> GetDropdownByPackageIdAsync(Guid packageId)
+        [Route("dropdown-by-packageid")]
+        [HttpPost]
+        public async Task<Response<List<Document>>> GetDropdownByPackageIdAsync([FromBody] DocumentByPackageIdDto request)
         {
-            return await _documentRepository.GetDropdownByPackageIdAsync(packageId);
+            return await _documentRepository.GetDropdownByPackageIdAsync(request);
         }
 
         [Route("{projectId}")]

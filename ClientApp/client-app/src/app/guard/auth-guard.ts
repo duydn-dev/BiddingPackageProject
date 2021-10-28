@@ -30,8 +30,8 @@ export class AuthGuard implements CanActivate {
         this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: "thời gian hoạt động đã hết, hệ thống sẽ tự chuyển hướng về trang đăng nhập !" });
           setTimeout(() => {
               this._store.dispatch(userActions.logout());
-              this._router.navigate(["/login"]);
-          }, 3000);
+              this._router.navigate(["login"]);
+          }, 2000);
         return false;
       }
       //return true;

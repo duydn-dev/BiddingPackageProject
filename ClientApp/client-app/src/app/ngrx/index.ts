@@ -1,15 +1,18 @@
 import { ActionReducer, ActionReducerMap, MetaReducer } from '@ngrx/store';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import * as fromUser from './reducers/user.reducer';
+import * as fromSpinner from './reducers/spinner.reducer';
 
 const environment:any = {
   production: false
 }
 export interface State {
     user: fromUser.State;
+    spinner: fromSpinner.State;
 }
 export const reducers: ActionReducerMap<State> = {
     user: fromUser.reducer,
+    spinner: fromSpinner.reducer
 };
 
 const reducerKeys = ['user'];

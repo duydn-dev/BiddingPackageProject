@@ -63,6 +63,9 @@ img {
     height: 250px;
     overflow-y: scroll;
 }
+.currsor-pointer{
+    cursor: pointer;
+}
 @media screen and (max-width: 576px) {
     .product-item {
         flex-wrap: wrap;
@@ -75,4 +78,7 @@ img {
         margin: 0 0 1rem 0;
         width: 100px;
     }
+}
+.disabled{
+    color: red;
 }

@@ -88,6 +88,7 @@ namespace Neac.BusinessLogic.Repository
             {
                 request.ProjectDate = request.ProjectDate.Value.AddDays(1);
                 request.ProjectId = Guid.NewGuid();
+                request.CurrentState = 0;
                 if (request?.BiddingPackageDtos.Count > 0)
                 {
                     request?.BiddingPackageDtos.ForEach(async n =>

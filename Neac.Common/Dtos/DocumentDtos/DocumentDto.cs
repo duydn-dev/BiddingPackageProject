@@ -14,4 +14,9 @@ namespace Neac.Common.Dtos.DocumentDtos
         public bool? IsCommon { get; set; } // dùng chung cho nhiều gói thầu
         public Guid? BiddingPackageId { get; set; }
     }
+    public class DocumentByPackageIdDto
+    {
+        public Guid? PackageId { get; set; }
+        public Guid? ProjectId { get; set; }
+    }
 }

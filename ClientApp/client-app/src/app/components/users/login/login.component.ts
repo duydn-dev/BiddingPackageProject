@@ -7,6 +7,7 @@ import { State } from 'src/app/ngrx/reducers/user.reducer';
 import * as userActions from '../../../ngrx/actions/login.action';
 import { UserService } from '../../../services/user/user.service';
 import { MessageService } from 'primeng/api';
+import { SpinnerService } from 'src/app/services/spinner/spinner.service';
 
 
 @Component({
@@ -25,7 +26,8 @@ export class LoginComponent implements OnInit {
     private store: Store<State>,
     private _router: Router,
     private _userService: UserService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _spinnerService: SpinnerService
   ) { }
 
   ngOnInit(): void {
@@ -40,12 +42,15 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.invalid) {
       return;
     }
+    this._spinnerService.start();
     this._userService.login(this.loginForm.value).subscribe(response => {
       if(response.success){
         this.store.dispatch(userActions.login({user:{...response.responseData }}));
+        this._spinnerService.stop();
         this._router.navigate(["/"]);
       }
       else{
+        this._spinnerService.stop();
         this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
       }
     })

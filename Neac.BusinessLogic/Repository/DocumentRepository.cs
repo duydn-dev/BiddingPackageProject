@@ -128,12 +128,23 @@ namespace Neac.BusinessLogic.Repository
             }
         }
 
-        public async Task<Response<List<Document>>> GetDropdownByPackageIdAsync(Guid packageId)
+        public async Task<Response<List<Document>>> GetDropdownByPackageIdAsync(DocumentByPackageIdDto request)
         {
             try
             {
-                var documents = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.IsCommon.Value || n.BiddingPackageId == packageId).ToListAsync();
-                return Response<List<Document>>.CreateSuccessResponse(documents);
+                var listImported = await _unitOfWork.GetRepository<ProjectFlow>()
+                    .GetByExpression(n => n.ProjectId == request.ProjectId && n.BiddingPackageId == request.PackageId)
+                    .Select(n => n.DocumentId)
+                    .ToListAsync();
+                //var documents = await _unitOfWork.GetRepository<Document>()
+                //    .GetByExpression(n => (n.IsCommon.Value && n.BiddingPackageId == null) || n.BiddingPackageId == request.PackageId)
+                //    .WhereIf(listImported.Count > 0, n => !listImported.Contains(n.DocumentId))
+                //    .ToListAsync();
+                var document = await _unitOfWork.GetRepository<Document>()
+                    .GetByExpression(n => (n.IsCommon.Value && n.BiddingPackageId == null) || n.BiddingPackageId == request.PackageId)
+                    //.WhereIf(listImported.Count > 0, n => !listImported.Contains(n.DocumentId))
+                    .ToListAsync();
+                return Response<List<Document>>.CreateSuccessResponse(document, listImported);
             }
             catch(Exception ex)
             {

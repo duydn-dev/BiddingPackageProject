@@ -16,6 +16,7 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {OrderListModule} from 'primeng/orderlist';
 import {StepsModule} from 'primeng/steps';
 import {RadioButtonModule} from 'primeng/radiobutton';
+import {ProgressSpinnerModule} from 'primeng/progressspinner';
 
 @NgModule({
     exports: [
@@ -33,7 +34,8 @@ import {RadioButtonModule} from 'primeng/radiobutton';
         CheckboxModule,
         OrderListModule,
         StepsModule,
-        RadioButtonModule
+        RadioButtonModule,
+        ProgressSpinnerModule
     ]
 })
 export class PrimeNgModule {}

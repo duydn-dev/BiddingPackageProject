@@ -29,4 +29,7 @@ export class ProjectFlowService {
   getFlows(request:any){
     return this._baseService.getWithQuery('api/projectflow', "filter", JSON.stringify(request));
   }
+  getFlowById(flowId:any){
+    return this._baseService.get('api/projectflow/get-by-id', flowId);
+  }
 }

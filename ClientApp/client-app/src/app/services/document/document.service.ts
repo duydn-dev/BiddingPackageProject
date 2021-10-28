@@ -16,8 +16,8 @@ export class DocumentService {
   getDropDown(){
     return this._baseService.get("api/document/dropdown");
   }
-  getDropDownByPackage(packageId:any){
-    return this._baseService.get("api/document/dropdown-by-packageid", packageId);
+  getDropDownByPackage(request:any){
+    return this._baseService.post("api/document/dropdown-by-packageid", request);
   }
   getById(documentId:any){
     return this._baseService.get("api/document", documentId);

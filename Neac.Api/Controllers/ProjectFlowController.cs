@@ -29,7 +29,7 @@ namespace Neac.Api.Controllers
         [Route("")]
         [HttpGet]
         [RoleDescription("Xem danh sách luồng dự án")]
-        public async Task<Response<List<ProjectFlow>>> GetFilterAsync([FromQuery]string filter)
+        public async Task<Response<List<ProjectFlowGetListDto>>> GetFilterAsync([FromQuery]string filter)
         {
             return await _projectFlowRepository.GetFilterAsync(filter);
         }
@@ -46,6 +46,14 @@ namespace Neac.Api.Controllers
         public async Task<Response<Guid>> CurrentPackageAsync(Guid projectId)
         {
             return await _projectFlowRepository.CurrentPackageAsync(projectId);
+        }
+
+        [Route("get-by-id/{projectFlowId}")]
+        [HttpGet]
+        [RoleDescription("Xem quy trình thực thi dự án")]
+        public async Task<Response<ProjectFlow>> GetByIdAsync([FromRoute] Guid projectFlowId)
+        {
+            return await _projectFlowRepository.GetByIdAsync(projectFlowId);
         }
 
         [Route("create")]
@@ -67,7 +75,7 @@ namespace Neac.Api.Controllers
 
         [Route("download/{projectFlowId}")]
         [HttpGet]
-        [RoleDescription("Tải xuống văn bản")]
+        [AllowAnonymous]
         public async Task<IActionResult> DownloadAsync([FromRoute] Guid projectFlowId)
         {
             var filePath = await _projectFlowRepository.DownloadAsync(projectFlowId);

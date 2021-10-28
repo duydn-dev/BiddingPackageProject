@@ -8,3 +8,8 @@
     </div>
 </main>
 <p-toast position="bottom-right"></p-toast>
+
+<p-dialog [(visible)]="progressSpinnerDlg" styleClass="ui-dialog-transparent" [closable]="false"
+    [showHeader]="false" [resizable]="false" [modal]="true">
+    <p-progressSpinner [style]="{width: '50px', height: '50px'}" styleClass="custom-spinner" strokeWidth="3" animationDuration=".5s"></p-progressSpinner>
+</p-dialog>

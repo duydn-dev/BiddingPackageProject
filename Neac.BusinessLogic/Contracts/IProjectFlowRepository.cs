@@ -12,7 +12,8 @@ namespace Neac.BusinessLogic.Contracts
 {
     public interface IProjectFlowRepository
     {
-        Task<Response<List<ProjectFlow>>> GetFilterAsync(string filter);
+        Task<Response<List<ProjectFlowGetListDto>>> GetFilterAsync(string filter);
+        Task<Response<ProjectFlow>> GetByIdAsync(Guid projectFlowId);
         Task<Response<ProjectFlow>> CreateAsync();
         Task<Response<ProjectFlow>> UpdateAsync(ProjectFlow request);
         Task<Response<List<ProjectFlowCurrentDto>>> CurrentState(Guid projectId);
