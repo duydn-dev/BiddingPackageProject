@@ -19,4 +19,9 @@ namespace Neac.Common.Const
         public const int Offline = 0;
         public const int Online = 1;
     }
+    public static class ProjectState
+    {
+        public const int Excuting = 0;
+        public const int Excuted = 1;
+    }
 }

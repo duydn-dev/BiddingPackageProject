@@ -64,13 +64,19 @@ namespace Neac.Api.Controllers
             return await _projectFlowRepository.CreateAsync();
         }
 
-        [Route("update/{projectFlowId}")]
-        [HttpPut]
+        [Route("update")]
+        [HttpPost]
         [RoleDescription("Chỉnh sửa luồng dự án")]
-        public async Task<Response<ProjectFlow>> UpdateAsync([FromRoute] Guid projectFlowId, [FromBody] ProjectFlow request)
+        public async Task<Response<ProjectFlow>> UpdateAsync()
         {
-            request.ProjectFlowId = projectFlowId;
-            return await _projectFlowRepository.UpdateAsync(request);
+            return await _projectFlowRepository.UpdateAsync();
+        }
+        [Route("delete/{projectFlowId}")]
+        [HttpDelete]
+        [RoleDescription("Xóa văn bản trong luồng dự án")]
+        public async Task<Response<bool>> DeleteAsync([FromRoute] Guid projectFlowId)
+        {
+            return await _projectFlowRepository.DeleteAsync(projectFlowId);
         }
 
         [Route("download/{projectFlowId}")]

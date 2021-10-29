@@ -15,7 +15,8 @@ namespace Neac.BusinessLogic.Contracts
         Task<Response<List<ProjectFlowGetListDto>>> GetFilterAsync(string filter);
         Task<Response<ProjectFlow>> GetByIdAsync(Guid projectFlowId);
         Task<Response<ProjectFlow>> CreateAsync();
-        Task<Response<ProjectFlow>> UpdateAsync(ProjectFlow request);
+        Task<Response<ProjectFlow>> UpdateAsync();
+        Task<Response<bool>> DeleteAsync(Guid projectFlowId);
         Task<Response<List<ProjectFlowCurrentDto>>> CurrentState(Guid projectId);
         Task<Response<Guid>> CurrentPackageAsync(Guid projectId);
         Task<string> UploadFile(IFormFile file);
