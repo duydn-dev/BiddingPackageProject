@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Aspose.Cells;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Neac.Api.Attributes;
@@ -19,9 +21,11 @@ namespace Neac.Api.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectRepository _projectRepository;
-        public ProjectController(IProjectRepository projectRepository)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProjectController(IProjectRepository projectRepository, IWebHostEnvironment webHostEnvironment)
         {
             _projectRepository = projectRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [Route("")]
@@ -38,6 +42,33 @@ namespace Neac.Api.Controllers
         public async Task<Response<ProjectGetListDto>> GetByIdAsync(Guid projectId)
         {
             return await _projectRepository.GetByIdAsync(projectId);
+        }
+        [Route("export-excel")]
+        [HttpGet]
+        //[RoleDescription("Xuất file excel")]
+        [AllowAnonymous]
+        public async Task<JsonResult> ExportExcelAsync()
+        {
+            var licensePath = System.IO.Path.Combine(_webHostEnvironment.ContentRootPath, "Libs", "License.lic");
+            if (System.IO.File.Exists(licensePath))
+            {
+                Workbook workbook = new Workbook();
+                try
+                {
+                    License lic = new License();
+                    lic.SetLicense(licensePath);
+                    if (workbook.IsLicensed)
+                    {
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            return new JsonResult(new { });
         }
 
         [Route("create")]

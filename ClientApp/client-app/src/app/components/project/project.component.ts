@@ -69,6 +69,11 @@ export class ProjectComponent implements OnInit {
     this.search.pageIndex = (event.page + 1);
     this.getFilter();
   }
+  exportExcel(projectId:any){
+    this._projectService.getById(projectId).subscribe(response => {
+
+    });
+  }
   openEditForm(projectId:any = null){
     this.projectForm.reset();
     this.projectId = projectId;

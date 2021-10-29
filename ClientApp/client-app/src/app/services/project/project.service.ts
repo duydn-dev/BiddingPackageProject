@@ -26,4 +26,7 @@ export class ProjectService {
   delete(projectId:any){
     return this._baseService.delete('api/project/delete', projectId);
   }
+  exportExcel(projectId:any){
+    return this._baseService.get('api/project/export-excel', projectId);
+  }
 }

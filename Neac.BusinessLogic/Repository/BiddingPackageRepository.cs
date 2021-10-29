@@ -116,6 +116,8 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                await _unitOfWork.GetRepository<BiddingPackageProject>().DeleteByExpression(n => n.BiddingPackageId == BiddingPackageId);
+                await _unitOfWork.GetRepository<ProjectFlow>().DeleteByExpression(n => n.BiddingPackageId == BiddingPackageId);
                 await _unitOfWork.GetRepository<BiddingPackage>().DeleteByExpression(n => n.BiddingPackageId == BiddingPackageId);
                 await _unitOfWork.SaveAsync();
                 return Response<bool>.CreateSuccessResponse(true);

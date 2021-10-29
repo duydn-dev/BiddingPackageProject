@@ -76,30 +76,30 @@ namespace Neac.BusinessLogic.Repository
                         LastPackageDocumentCount = value.Count(g => g.DocumentId != Guid.Empty)
                     }).FirstOrDefault();
 
-                if(projectFlow.BiddingPackageId == maxOrder.BiddingPackageId)
-                {
-                    if((countCurrentDocument + 1) == (maxOrder.LastPackageDocumentCount + documentCommon))
-                    {
-                        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
-                        projectInfo.CurrentState = ProjectState.Excuted;
-                        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
-                    }
-                }
-                if (_httpContextAccessor.HttpContext.Request.Form.Files?.Count > 0)
-                {
-                    var file = _httpContextAccessor.HttpContext.Request.Form.Files[0];
-                    string filePath = null;
-                    if (file != null)
-                    {
-                        filePath = await UploadFile(file);
-                        projectFlow.FileUrl = filePath;
-                    }
-                }
-                projectFlow.ProjectFlowId = Guid.NewGuid();
-                var request = _mapper.Map<ProjectFlowCreateDto, ProjectFlow>(projectFlow);
-                await _unitOfWork.GetRepository<ProjectFlow>().Add(request);
-                await _unitOfWork.SaveAsync();
-                return Response<ProjectFlow>.CreateSuccessResponse(request);
+                //if(projectFlow.BiddingPackageId == maxOrder.BiddingPackageId)
+                //{
+                //    if((countCurrentDocument + 1) == (maxOrder.LastPackageDocumentCount + documentCommon))
+                //    {
+                //        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
+                //        projectInfo.CurrentState = ProjectState.Excuted;
+                //        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
+                //    }
+                //}
+                //if (_httpContextAccessor.HttpContext.Request.Form.Files?.Count > 0)
+                //{
+                //    var file = _httpContextAccessor.HttpContext.Request.Form.Files[0];
+                //    string filePath = null;
+                //    if (file != null)
+                //    {
+                //        filePath = await UploadFile(file);
+                //        projectFlow.FileUrl = filePath;
+                //    }
+                //}
+                //projectFlow.ProjectFlowId = Guid.NewGuid();
+                //var request = _mapper.Map<ProjectFlowCreateDto, ProjectFlow>(projectFlow);
+                //await _unitOfWork.GetRepository<ProjectFlow>().Add(request);
+                //await _unitOfWork.SaveAsync();
+                return Response<ProjectFlow>.CreateSuccessResponse(new ProjectFlow());
             }
             catch (Exception ex)
             {
@@ -134,7 +134,7 @@ namespace Neac.BusinessLogic.Repository
                 //.ToListAsync();
 
                 var data = query.GroupJoin(
-                    _unitOfWork.GetRepository<ProjectFlow>().GetAll(),
+                    _unitOfWork.GetRepository<ProjectFlow>().GetAll().Where(n => n.ProjectId == projectId),
                     l => l.BiddingPackageId,
                     r => r.BiddingPackageId,
                     (l, r) => new ProjectFlowCurrentDto

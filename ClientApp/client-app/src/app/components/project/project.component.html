@@ -48,6 +48,10 @@
                             <i class="material-icons">create</i>
                             Sửa
                         </button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-excel mr-20" (click)="exportExcel(item.projectId)">
+                            <i class="material-icons">insert_drive_file</i>
+                            Xuất Excel
+                        </button>
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red" (click)="openDeleteForm(item.projectId)">
                             <i class="material-icons">delete</i>
                             Xóa
