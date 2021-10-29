@@ -47,6 +47,13 @@ namespace Neac.Api.Controllers
         {
             return await _documentRepository.GetDropdownByPackageIdAsync(request);
         }
+        [AllowAnonymous]
+        [Route("get-setting-document/{projectId}")]
+        [HttpGet]
+        public async Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync([FromRoute] Guid projectId)
+        {
+            return await _documentRepository.GetSettingDocumentAsync(projectId);
+        }
 
         [Route("{projectId}")]
         [HttpGet]

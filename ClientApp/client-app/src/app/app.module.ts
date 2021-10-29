@@ -27,6 +27,7 @@ import { DecentralizationComponent } from './components/users/decentralization/d
 import { BiddingPackageComponent } from './components/bidding-package/bidding-package.component';
 import { DocumentComponent } from './components/document/document.component';
 import { ProjectFlowComponent } from './components/project-flow/project-flow.component';
+import { DocumentSettingComponent } from './components/document-setting/document-setting.component';
 
 
 
@@ -44,6 +45,7 @@ import { ProjectFlowComponent } from './components/project-flow/project-flow.com
     BiddingPackageComponent,
     DocumentComponent,
     ProjectFlowComponent,
+    DocumentSettingComponent,
   ],
   imports: [
     BrowserModule,

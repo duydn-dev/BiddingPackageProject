@@ -17,6 +17,7 @@ namespace Neac.DataAccess
         public string Note { get; set; }
         public bool? IsCommon { get; set; } // dùng chung cho nhiều gói thầu
         public Guid? BiddingPackageId { get; set; }
+        public int? Order { get; set; }
 
         public BiddingPackage BiddingPackage { get; set; }
     }

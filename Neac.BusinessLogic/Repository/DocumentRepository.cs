@@ -86,6 +86,7 @@ namespace Neac.BusinessLogic.Repository
             try
             {
                 request.DocumentId = Guid.NewGuid();
+                request.IsCommon = request.IsCommon ?? false;
                 var mapped = _mapper.Map<DocumentDto, Document>(request);
                 await _unitOfWork.GetRepository<Document>().Add(mapped);
                 await _unitOfWork.SaveAsync();
@@ -150,6 +151,59 @@ namespace Neac.BusinessLogic.Repository
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<List<Document>>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync(Guid projectId)
+        {
+            try
+            {
+                // lấy ra danh sách văn bản thuộc gói thầu
+                var query = await (from b in _unitOfWork.GetRepository<BiddingPackage>().GetAll()
+                        join bp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll() on b.BiddingPackageId equals bp.BiddingPackageId
+                        join d in _unitOfWork.GetRepository<Document>().GetAll() on b.BiddingPackageId equals d.BiddingPackageId
+                        where bp.ProjectId == projectId
+                        select new
+                        {
+                            b.BiddingPackageId,
+                            b.BiddingPackageName,
+                            d.DocumentId,
+                            d.DocumentName,
+                            d.IsCommon,
+                            d.Order
+                        }).ToListAsync();
+                var queryData = query.GroupBy(b => new
+                {
+                    b.BiddingPackageId,
+                    b.BiddingPackageName,
+                }, (key, data) => new PackageListByProjectDto
+                {
+                    BiddingPackageId = key.BiddingPackageId,
+                    BiddingPackageName = key.BiddingPackageName,
+                    Documents = data.Select(n => new DocumentListByProjectDto 
+                    { 
+                        DocumentId = n.DocumentId, 
+                        DocumentName = n.DocumentName, 
+                        IsCommon = n.IsCommon,
+                        Order = n.Order 
+                    })
+                });
+                //var data = _unitOfWork.GetRepository<BiddingPackageProject>().GetAll().Where(n => n.ProjectId == projectId).AsEnumerable()
+                //    .GroupJoin(
+                //        _unitOfWork.GetRepository<Document>().GetAll().AsEnumerable(),
+                //        left => left.BiddingPackageId,
+                //        right => right.BiddingPackageId,
+                //        (key, data) => new 
+                //        {
+                            
+                //        }
+                //    ).OrderBy();
+                return Response<IEnumerable<PackageListByProjectDto>>.CreateSuccessResponse(queryData);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<IEnumerable<PackageListByProjectDto>>.CreateErrorResponse(ex);
             }
         }
     }

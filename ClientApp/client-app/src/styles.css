@@ -27,3 +27,7 @@ html, body{
   background-color: #069f0f;
   color: #fff;
 }
+.mdl-button.button--colored-excuted:not([disabled]).mdl-button--raised, .mdl-button.button--colored-excuted:not([disabled]).mdl-button--raised:hover {
+  background-color: #3562d5;
+  color: #fff;
+}

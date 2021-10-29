@@ -19,4 +19,17 @@ namespace Neac.Common.Dtos.DocumentDtos
         public Guid? PackageId { get; set; }
         public Guid? ProjectId { get; set; }
     }
+    public class PackageListByProjectDto
+    {
+        public Guid? BiddingPackageId { get; set; }
+        public string BiddingPackageName { get; set; }
+        public IEnumerable<DocumentListByProjectDto> Documents { get; set; }
+    }
+    public class DocumentListByProjectDto
+    {
+        public Guid? DocumentId {get; set;} 
+        public string DocumentName {get; set;}
+        public bool? IsCommon {get; set;}
+        public int? Order { get; set; }
+    }
 }
