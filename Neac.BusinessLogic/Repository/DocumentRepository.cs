@@ -169,8 +169,7 @@ namespace Neac.BusinessLogic.Repository
                             b.BiddingPackageName,
                             d.DocumentId,
                             d.DocumentName,
-                            d.IsCommon,
-                            d.Order
+                            d.IsCommon
                         }).ToListAsync();
                 var queryData = query.GroupBy(b => new
                 {
@@ -184,26 +183,51 @@ namespace Neac.BusinessLogic.Repository
                     { 
                         DocumentId = n.DocumentId, 
                         DocumentName = n.DocumentName, 
-                        IsCommon = n.IsCommon,
-                        Order = n.Order 
+                        IsCommon = n.IsCommon
                     })
                 });
-                //var data = _unitOfWork.GetRepository<BiddingPackageProject>().GetAll().Where(n => n.ProjectId == projectId).AsEnumerable()
-                //    .GroupJoin(
-                //        _unitOfWork.GetRepository<Document>().GetAll().AsEnumerable(),
-                //        left => left.BiddingPackageId,
-                //        right => right.BiddingPackageId,
-                //        (key, data) => new 
-                //        {
-                            
-                //        }
-                //    ).OrderBy();
-                return Response<IEnumerable<PackageListByProjectDto>>.CreateSuccessResponse(queryData);
+
+                // lấy ra dữ liệu danh sách văn bản thuộc gói thầu đc cấu hình
+                var documentSettings = await _unitOfWork.GetRepository<DocumentSetting>()
+                    .GetByExpression(n => n.ProjectId == projectId)
+                    .OrderBy(n => n.Order)
+                    .ToListAsync();
+                return Response<IEnumerable<PackageListByProjectDto>>.CreateSuccessResponse(queryData, documentSettings);
             }
             catch(Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<IEnumerable<PackageListByProjectDto>>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, DocumentSettingCreateDto request)
+        {
+            try
+            {
+                var settings = await _unitOfWork.GetRepository<DocumentSetting>().DeleteByExpression(n => n.ProjectId == projectId);
+                if(request.Documents?.Count > 0)
+                {
+                    foreach (var item in request.Documents)
+                    {
+                        await _unitOfWork.GetRepository<DocumentSetting>().Add(
+                            new DocumentSetting
+                            {
+                                BiddingPackageId = request.BiddingPackageId,
+                                DocumentId = item.DocumentId,
+                                DocumentSettingId = Guid.NewGuid(),
+                                Order = item.Order,
+                                ProjectId = projectId
+                            });
+                    }
+                }
+                await _unitOfWork.SaveAsync();
+                return Response<Guid>.CreateSuccessResponse(projectId);
+            }
+            catch (Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<Guid>.CreateErrorResponse(ex);
             }
         }
     }

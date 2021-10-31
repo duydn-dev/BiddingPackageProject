@@ -32,4 +32,14 @@ namespace Neac.Common.Dtos.DocumentDtos
         public bool? IsCommon {get; set;}
         public int? Order { get; set; }
     }
+    public class DocumentSettingCreateDto
+    {
+        public Guid? BiddingPackageId { get; set; }
+        public List<DocumentSettingCreateDataDto> Documents { get; set; }
+    }
+    public class DocumentSettingCreateDataDto
+    {
+        public Guid? DocumentId { get; set; }
+        public int? Order { get; set; }
+    }
 }

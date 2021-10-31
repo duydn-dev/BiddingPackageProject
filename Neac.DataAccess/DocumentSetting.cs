@@ -8,16 +8,14 @@ using System.Threading.Tasks;
 
 namespace Neac.DataAccess
 {
-    [Table("Document")]
-    public class Document
+    [Table("DocumentSetting")]
+    public class DocumentSetting
     {
         [Key]
-        public Guid DocumentId { get; set; }
-        public string DocumentName { get; set; }
-        public string Note { get; set; }
-        public bool? IsCommon { get; set; } // dùng chung cho nhiều dự án
+        public Guid DocumentSettingId { get; set; }
+        public Guid? ProjectId { get; set; }
         public Guid? BiddingPackageId { get; set; }
-
-        public BiddingPackage BiddingPackage { get; set; }
+        public Guid? DocumentId { get; set; }
+        public int? Order { get; set; }
     }
 }
