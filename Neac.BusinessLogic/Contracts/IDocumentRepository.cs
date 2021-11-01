@@ -18,5 +18,7 @@ namespace Neac.BusinessLogic.Contracts
         Task<Response<DocumentDto>> CreateAsync(DocumentDto request);
         Task<Response<DocumentDto>> UpdateAsync(DocumentDto request);
         Task<Response<bool>> DeleteAsync(Guid projectId);
+        Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync(Guid projectId);
+        Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, DocumentSettingCreateDto request);
     }
 }

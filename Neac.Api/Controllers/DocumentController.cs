@@ -47,6 +47,13 @@ namespace Neac.Api.Controllers
         {
             return await _documentRepository.GetDropdownByPackageIdAsync(request);
         }
+        [AllowAnonymous]
+        [Route("get-setting-document/{projectId}")]
+        [HttpGet]
+        public async Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync([FromRoute] Guid projectId)
+        {
+            return await _documentRepository.GetSettingDocumentAsync(projectId);
+        }
 
         [Route("{projectId}")]
         [HttpGet]
@@ -77,6 +84,13 @@ namespace Neac.Api.Controllers
         public async Task<Response<bool>> DeleteAsync(Guid projectId)
         {
             return await _documentRepository.DeleteAsync(projectId);
+        }
+        [Route("save-document-setting/{projectId}")]
+        [HttpPut]
+        [RoleDescription("Lưu cấu hình văn bản")]
+        public async Task<Response<Guid>> SaveDocumentSettingAsync([FromRoute]Guid projectId,  [FromBody] DocumentSettingCreateDto request)
+        {
+            return await _documentRepository.SaveDocumentSettingAsync(projectId, request);
         }
     }
 }

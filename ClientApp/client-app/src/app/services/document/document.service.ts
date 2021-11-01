@@ -31,4 +31,8 @@ export class DocumentService {
   delete(documentId){
     return this._baseService.delete("api/document/delete", documentId);
   }
+
+  getSettingDocument(documentId){
+    return this._baseService.get("api/document/get-setting-document", documentId);
+  }
 }

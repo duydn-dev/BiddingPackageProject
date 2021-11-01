@@ -24,6 +24,7 @@ namespace Neac.DataAccess
         public DbSet<BiddingPackage> BiddingPackages { get; set; }
         public DbSet<BiddingPackageProject> BiddingPackageProjects { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<DocumentSetting> DocumentSettings { get; set; }
         public DbSet<ProjectFlow> ProjectFlows { get; set; }
     }
     public class NeacDbContextFactory : IDesignTimeDbContextFactory<NeacDbContext>

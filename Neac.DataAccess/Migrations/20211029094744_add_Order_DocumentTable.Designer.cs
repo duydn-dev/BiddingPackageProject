@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Neac.DataAccess;
 
 namespace Neac.DataAccess.Migrations
 {
     [DbContext(typeof(NeacDbContext))]
-    partial class NeacDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211029094744_add_Order_DocumentTable")]
+    partial class add_Order_DocumentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,34 +77,14 @@ namespace Neac.DataAccess.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("Order")
+                        .HasColumnType("int");
+
                     b.HasKey("DocumentId");
 
                     b.HasIndex("BiddingPackageId");
 
                     b.ToTable("Document");
-                });
-
-            modelBuilder.Entity("Neac.DataAccess.DocumentSetting", b =>
-                {
-                    b.Property<Guid>("DocumentSettingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("BiddingPackageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("DocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("DocumentSettingId");
-
-                    b.ToTable("DocumentSetting");
                 });
 
             modelBuilder.Entity("Neac.DataAccess.GroupRole", b =>

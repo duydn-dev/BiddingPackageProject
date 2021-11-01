@@ -86,6 +86,7 @@ namespace Neac.BusinessLogic.Repository
             try
             {
                 request.DocumentId = Guid.NewGuid();
+                request.IsCommon = request.IsCommon ?? false;
                 var mapped = _mapper.Map<DocumentDto, Document>(request);
                 await _unitOfWork.GetRepository<Document>().Add(mapped);
                 await _unitOfWork.SaveAsync();
@@ -150,6 +151,83 @@ namespace Neac.BusinessLogic.Repository
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<List<Document>>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync(Guid projectId)
+        {
+            try
+            {
+                // lấy ra danh sách văn bản thuộc gói thầu
+                var query = await (from b in _unitOfWork.GetRepository<BiddingPackage>().GetAll()
+                        join bp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll() on b.BiddingPackageId equals bp.BiddingPackageId
+                        join d in _unitOfWork.GetRepository<Document>().GetAll() on b.BiddingPackageId equals d.BiddingPackageId
+                        where bp.ProjectId == projectId
+                        select new
+                        {
+                            b.BiddingPackageId,
+                            b.BiddingPackageName,
+                            d.DocumentId,
+                            d.DocumentName,
+                            d.IsCommon
+                        }).ToListAsync();
+                var queryData = query.GroupBy(b => new
+                {
+                    b.BiddingPackageId,
+                    b.BiddingPackageName,
+                }, (key, data) => new PackageListByProjectDto
+                {
+                    BiddingPackageId = key.BiddingPackageId,
+                    BiddingPackageName = key.BiddingPackageName,
+                    Documents = data.Select(n => new DocumentListByProjectDto 
+                    { 
+                        DocumentId = n.DocumentId, 
+                        DocumentName = n.DocumentName, 
+                        IsCommon = n.IsCommon
+                    })
+                });
+
+                // lấy ra dữ liệu danh sách văn bản thuộc gói thầu đc cấu hình
+                var documentSettings = await _unitOfWork.GetRepository<DocumentSetting>()
+                    .GetByExpression(n => n.ProjectId == projectId)
+                    .OrderBy(n => n.Order)
+                    .ToListAsync();
+                return Response<IEnumerable<PackageListByProjectDto>>.CreateSuccessResponse(queryData, documentSettings);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<IEnumerable<PackageListByProjectDto>>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, DocumentSettingCreateDto request)
+        {
+            try
+            {
+                var settings = await _unitOfWork.GetRepository<DocumentSetting>().DeleteByExpression(n => n.ProjectId == projectId);
+                if(request.Documents?.Count > 0)
+                {
+                    foreach (var item in request.Documents)
+                    {
+                        await _unitOfWork.GetRepository<DocumentSetting>().Add(
+                            new DocumentSetting
+                            {
+                                BiddingPackageId = request.BiddingPackageId,
+                                DocumentId = item.DocumentId,
+                                DocumentSettingId = Guid.NewGuid(),
+                                Order = item.Order,
+                                ProjectId = projectId
+                            });
+                    }
+                }
+                await _unitOfWork.SaveAsync();
+                return Response<Guid>.CreateSuccessResponse(projectId);
+            }
+            catch (Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<Guid>.CreateErrorResponse(ex);
             }
         }
     }

@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { BiddingService } from 'src/app/services/bidding-package/bidding-package.service';
 import { DocumentService } from 'src/app/services/document/document.service';
 import { ProjectFlowService } from 'src/app/services/project-flow/project-flow.service';
@@ -35,7 +35,8 @@ export class ProjectFlowComponent implements OnInit {
     private _messageService: MessageService,
     private _biddingService: BiddingService,
     private _documentService: DocumentService,
-    private _flowService: ProjectFlowService
+    private _flowService: ProjectFlowService,
+    private _confirmationService: ConfirmationService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -118,7 +119,6 @@ export class ProjectFlowComponent implements OnInit {
           n.disabled = (str == 'disabled');
           return n;
         });
-        console.log(this.dropdownDocument);
       }
     }
   }
@@ -129,12 +129,26 @@ export class ProjectFlowComponent implements OnInit {
     }
     return "";
   }
-  // onSelecteDocument(event, option){
-  //   const str = this.isDisabledOption(option);
-  //   console.log(event);
-  //   if(str == 'disabled')
-  //     event.stopPropagation();
-  // }
+  openDeletePop(projectFlowId:any){
+    this._confirmationService.confirm({
+      message: 'Bạn có chắc chắn muốn xóa ?',
+      header: '',
+      accept: () => {
+         this._flowService.delete(projectFlowId).subscribe(
+          response => {
+            if(response.responseData){
+              this.initData();
+              this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Xóa thành công !' });
+            }
+            else {
+              this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
+            }
+          })
+      },
+      reject: () => {
+      }
+    });
+  }
   onFileChange(event){
     if(event.target.files.length > 0)
       this.file = event.target.files[0];
@@ -205,7 +219,16 @@ export class ProjectFlowComponent implements OnInit {
     request.biddingPackageId = this.currentPackage;
 
     if(this.documentForm.get('projectFlowId').value){
-      console.log(this.documentForm.value)
+      const response = await this._flowService.updateFlow(this.file, request).toPromise();
+      if(response.success){
+        await this.getFlows();
+        this.isSubmit = false;
+        this.isShowModal = false;
+        this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Cập nhật thành công !' });
+      }
+      else{
+        this._messageService.add({ severity: 'error', summary: 'Lỗi !', detail: response.message });
+      }
     }
     else{
       const response = await this._flowService.createFlow(this.file, request).toPromise();

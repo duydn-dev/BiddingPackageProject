@@ -63,6 +63,16 @@
 <p-dialog [header]="documentId ? 'Chỉnh sửa văn bản' : 'Thêm mới văn bản'" [(visible)]="isShowModal"
     [modal]="true" [style]="{width: '30vw'}" [draggable]="false" [resizable]="false">
     <form (ngSubmit)="onSubmit()" [formGroup]="documentForm">
+        <div class="form-group mt-2">
+            <label class="col-lg-12 lh-30px">Gói thầu</label>
+            <div class="col-lg-12">
+                <p-dropdown [options]="packages" formControlName="biddingPackageId" optionValue="biddingPackageId" optionLabel="biddingPackageName" styleClass="w-100"></p-dropdown>
+                <div class="error pl-0" *ngIf="(form.biddingPackageId.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.biddingPackageId.errors?.required">Gói thầu không thể để
+                        trống</p>
+                </div>
+            </div>
+        </div>
         <div class="form-group">
             <label class="col-lg-12 lh-30px">Tên văn bản<span class="text-danger">*</span></label>
             <div class="col-lg-12">
@@ -75,25 +85,15 @@
             </div>
         </div>
         <div class="form-group mt-2">
-            <label class="col-lg-12 lh-30px">Văn bản dùng chung</label>
-            <div class="col-lg-12">
-                <p-checkbox name="groupname" label="Dùng chung" [binary]="true" formControlName="isCommon"></p-checkbox>
-            </div>
-        </div>
-        <div class="form-group mt-2" *ngIf="!documentForm.get('isCommon').value">
-            <label class="col-lg-12 lh-30px">Gói thầu</label>
-            <div class="col-lg-12">
-                <p-dropdown [options]="packages" formControlName="biddingPackageId" optionValue="biddingPackageId" optionLabel="biddingPackageName" styleClass="w-100"></p-dropdown>
-                <div class="error pl-0" *ngIf="(form.biddingPackageId.touched || isSubmit)">
-                    <p class="text-danger" *ngIf="form.biddingPackageId.errors?.required">Tên gói thầu không thể để
-                        trống</p>
-                </div>
-            </div>
-        </div>
-        <div class="form-group mt-2">
             <label class="col-lg-12 lh-30px">Ghi chú</label>
             <div class="col-lg-12">
                 <textarea pInputTextarea formControlName="note" class="w-100"></textarea>
+            </div>
+        </div>
+        <div class="form-group mt-2">
+            <label class="col-lg-12 lh-30px">Văn bản dùng chung</label>
+            <div class="col-lg-12">
+                <p-checkbox name="groupname" label="Dùng chung" [binary]="true" formControlName="isCommon"></p-checkbox>
             </div>
         </div>
         <div class="form-group float-end pt-3 pb-3">

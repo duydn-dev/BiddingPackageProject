@@ -26,12 +26,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- <button
-                            class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue"
-                            (click)="openCreatePackageForm()">
-                            <i class="material-icons">add_circle</i>
-                            Thêm gói thầu
-                        </button> -->
                     </div>
                     <div class="col-lg-9">
                         <p-steps [model]="packages" [(activeIndex)]="activeIndex" [readonly]="false"></p-steps>
@@ -71,9 +65,13 @@
                                     <a (click)="downloadFile(item.projectFlowId)" class="text-primary currsor-pointer">{{ getFileUrlv2(item.fileUrl) }}</a>
                                 </td>
                                 <td class="mdl-data-table__cell--non-numeric w-50px text-center">
-                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange" (click)="openCreateDocumentForm(item.projectFlowId)">
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openCreateDocumentForm(item.projectFlowId)">
                                         <i class="material-icons">create</i>
                                         Sửa
+                                    </button>
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-red" (click)="openDeletePop(item.projectFlowId)">
+                                        <i class="material-icons">delete</i>
+                                        Xóa
                                     </button>
                                 </td>
                             </tr>
@@ -85,7 +83,7 @@
         </div>
     </div>
 </div>
-
+<p-confirmDialog header="" icon="pi pi-exclamation-triangle"></p-confirmDialog>
 <!-- flow add document -->
 <p-dialog header="Thêm mới văn bản" [(visible)]="isShowModal" [modal]="true" [style]="{width: '70vw'}"
     [draggable]="false" [resizable]="false">
@@ -104,13 +102,6 @@
                                 styleClass="w-100" 
                                 optionDisabled="disabled">
                             </p-dropdown>
-                            <!-- <p-dropdown [options]="dropdownDocument" formControlName="documentId" optionLabel="documentName" optionValue="documentId" styleClass="w-100">
-                                <ng-template let-option pTemplate="item">
-                                    <div>
-                                        <div (click)="onSelecteDocument($event, option)" [ngClass]="isDisabledOption(option)"> {{option.documentName}} </div>
-                                    </div>
-                                </ng-template>
-                            </p-dropdown> -->
                             <div class="error pl-0" *ngIf="(form.documentId.touched || isSubmit)">
                                 <p class="text-danger" *ngIf="form.documentId.errors?.required">Văn bản không thể để
                                     trống</p>

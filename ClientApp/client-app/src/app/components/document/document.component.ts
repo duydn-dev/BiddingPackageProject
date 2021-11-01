@@ -41,7 +41,7 @@ export class DocumentComponent implements OnInit {
       documentName: this._fb.control(null, [Validators.required]),
       note: this._fb.control(null),
       isCommon: this._fb.control(false),
-      biddingPackageId: this._fb.control(null),
+      biddingPackageId: this._fb.control(null, [Validators.required]),
     })
   }
   getFilter(){
@@ -54,6 +54,7 @@ export class DocumentComponent implements OnInit {
   }
   openEditForm(documentId:any = null){
     this.documentForm.reset();
+    this.documentForm.clearValidators();
     this.documentId = documentId;
     if(documentId){
       this._documentService.getById(documentId).subscribe(response => {
@@ -118,9 +119,11 @@ export class DocumentComponent implements OnInit {
         if(response.success){
           this.getFilter();
           this.isShowModal = false;
+          this.isSubmit = false;
           this._messageService.add({ severity: 'success', summary: 'Thành công !', detail: 'Thêm mới thành công !' });
         }
         else{
+          this.isSubmit = false;
           this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
         }
       })
