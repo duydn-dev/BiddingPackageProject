@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Neac.BusinessLogic.Contracts;
 using Neac.BusinessLogic.UnitOfWork;
+using Neac.Common.Const;
 using Neac.Common.Dtos;
 using Neac.Common.Dtos.BiddingPackage;
 using Neac.Common.Dtos.ProjectDtos;
@@ -38,7 +39,9 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                // kiểm tra gói thầu hiện tại đã đủ văn bản chưa
                 var projectFlow = JsonConvert.DeserializeObject<ProjectFlowCreateDto>(_httpContextAccessor.HttpContext.Request.Form["projectFlow"].ToString());
+                var documentCommon = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null && n.IsCommon.Value).CountAsync();
                 projectFlow.ProjectDate = projectFlow.ProjectDate.Value.AddDays(1);
                 var countDocumennt = await (from b in _unitOfWork.GetRepository<BiddingPackage>().GetAll()
                         join d in _unitOfWork.GetRepository<Document>().GetAll() on b.BiddingPackageId equals d.BiddingPackageId
@@ -53,6 +56,31 @@ namespace Neac.BusinessLogic.Repository
                 if((countDocumennt + commondocumentCount) == countCurrentDocument)
                 {
                     return Response<ProjectFlow>.CreateErrorResponse(new Exception($"Đã đủ văn bản trong gói thầu"));
+                }
+
+                // kiểm tra có phải gói thầu cuối không, nếu có đếm số lượng văn bản phải nhập và văn bản đã nhập, nếu văn bản đã nhập = tổng văn bản => update current state project = 1
+                var totalDocumentByProject = await (from bpp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
+                                                    join d in _unitOfWork.GetRepository<Document>().GetAll() on bpp.BiddingPackageId equals d.BiddingPackageId into gr from grData in gr.DefaultIfEmpty()
+                                                    where bpp.ProjectId == projectFlow.ProjectId
+                                                    orderby bpp.Order ascending
+                                                    select new {bpp.BiddingPackageId, bpp.Order, DocumentId = (grData == null) ? Guid.Empty : grData.DocumentId }
+                                                ).ToListAsync();
+
+                var maxOrder = totalDocumentByProject
+                    .Where(n => n.Order == totalDocumentByProject.Max(n => n.Order))
+                    .GroupBy(n => new { n.BiddingPackageId, n.Order }, (key, value) => new {
+                        key.BiddingPackageId,
+                        LastPackageDocumentCount = value.Count()
+                    }).FirstOrDefault();
+
+                if(projectFlow.BiddingPackageId == maxOrder.BiddingPackageId)
+                {
+                    if((countCurrentDocument + 1) == (maxOrder.LastPackageDocumentCount + documentCommon))
+                    {
+                        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
+                        projectInfo.CurrentState = ProjectState.Excuted;
+                        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
+                    }
                 }
 
                 var file = _httpContextAccessor.HttpContext.Request.Form.Files[0];
