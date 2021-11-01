@@ -4,7 +4,18 @@
             <h2 class="mdl-card__title-text">Cấu hình văn bản</h2>
         </div>
         <div class="mdl-card__supporting-text w-100">
-
+            <div class="w-100">
+                <button
+                    class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end" (click)="save()">
+                    <i class="material-icons">save</i>
+                    Lưu
+                </button>
+            </div>
+            <p-tree [value]="packageDocument">
+                <ng-template let-node pTemplate="default">
+                    <p-checkbox name="groupname" [value]="node.data" (onChange)="checkboxChange($event, node)" [(ngModel)]="packageDocumentSelected" [disabled]="node.isParent || node.isCommon" [label]="node.label"></p-checkbox>
+                </ng-template>
+            </p-tree>
         </div>
     </div>
 </div>

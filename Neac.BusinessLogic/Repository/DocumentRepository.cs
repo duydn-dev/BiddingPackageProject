@@ -200,6 +200,19 @@ namespace Neac.BusinessLogic.Repository
                 return Response<IEnumerable<PackageListByProjectDto>>.CreateErrorResponse(ex);
             }
         }
+        public async Task<Response<List<DocumentSetting>>> GetSettingsSelectedAsync(Guid projectId)
+        {
+            try
+            {
+                var settings = await _unitOfWork.GetRepository<DocumentSetting>().GetByExpression(n => n.ProjectId == projectId).ToListAsync();
+                return Response<List<DocumentSetting>>.CreateSuccessResponse(settings);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<List<DocumentSetting>>.CreateErrorResponse(ex);
+            }
+        }
 
         public async Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, DocumentSettingCreateDto request)
         {

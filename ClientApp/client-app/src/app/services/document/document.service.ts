@@ -32,7 +32,13 @@ export class DocumentService {
     return this._baseService.delete("api/document/delete", documentId);
   }
 
-  getSettingDocument(documentId){
-    return this._baseService.get("api/document/get-setting-document", documentId);
+  getSettingDocument(projectId){
+    return this._baseService.get("api/document/get-setting-document", projectId);
+  }
+  getSettingSelected(projectId){
+    return this._baseService.get("api/document/get-setting-selected", projectId);
+  }
+  saveDocumentSetting(projectId, documentSetting){
+    return this._baseService.put("api/document/save-document-setting",projectId, documentSetting);
   }
 }

@@ -17,6 +17,7 @@ import {OrderListModule} from 'primeng/orderlist';
 import {StepsModule} from 'primeng/steps';
 import {RadioButtonModule} from 'primeng/radiobutton';
 import {ProgressSpinnerModule} from 'primeng/progressspinner';
+import {TreeTableModule} from 'primeng/treetable';
 
 @NgModule({
     exports: [
@@ -35,7 +36,8 @@ import {ProgressSpinnerModule} from 'primeng/progressspinner';
         OrderListModule,
         StepsModule,
         RadioButtonModule,
-        ProgressSpinnerModule
+        ProgressSpinnerModule,
+        TreeTableModule
     ]
 })
 export class PrimeNgModule {}
