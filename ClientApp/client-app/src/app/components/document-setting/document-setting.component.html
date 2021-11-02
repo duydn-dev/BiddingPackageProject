@@ -13,9 +13,8 @@
             </div>
             <p-tree [value]="packageDocument">
                 <ng-template let-node pTemplate="default">
-                    <p-checkbox name="groupname" [value]="node.data" [(ngModel)]="packageDocumentSelected" [label]="node.label"></p-checkbox>
-                    <!-- <input type="text" pInputText class="p-inputtext-sm order mr-3" [disabled]="!node.isCommon && (node.isDisabled === undefined || node.isDisabled)" [(ngModel)]="node.order" *ngIf="!node.isParent" />
-                    <p-checkbox name="groupname" [value]="node.data" (onChange)="checkboxChange($event, node)" [(ngModel)]="packageDocumentSelected" [disabled]="node.isParent || node.isCommon" [label]="node.label"></p-checkbox> -->
+                    <input type="text" pInputText class="p-inputtext-sm order mr-3" [value]="getOrder(node.data)" [disabled]="!node.isCommon && (node.isDisabled === undefined || node.isDisabled)" [(ngModel)]="node.order" *ngIf="!node.isParent" />
+                    <p-checkbox name="groupname" [value]="node.data" (onChange)="checkboxChange($event, node)" [(ngModel)]="packageDocumentSelected" [disabled]="node.isParent || node.isCommon" [label]="node.label"></p-checkbox>
                 </ng-template>
             </p-tree>
         </div>

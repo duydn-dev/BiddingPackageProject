@@ -12,6 +12,8 @@ export class DocumentSettingComponent implements OnInit {
   projectId: any;
   packageDocument:any = [];
   packageDocumentSelected:any = [];
+  isInitDocument:boolean = true;
+  documentSelectedOrder:any = [];
   headers:any = [
     { field: 'label', header: 'Tên cấu hình' },
   ]
@@ -36,14 +38,18 @@ export class DocumentSettingComponent implements OnInit {
     return (documents && documents.length > 0) 
     ? documents.map(n => ({data: n.documentId, label: n.documentName, isCommon: n.isCommon, order: n.order}))
     : undefined
+  }
+  getOrder(data){
+    //const doc = this.documentSelectedOrder.find(n => n.)
   } 
   async buildSelected(){
     const response = await this.documentService.getSettingSelected(this.projectId).toPromise();
     if(response.success){
       if(response.responseData.length > 0){
-        console.log(this.packageDocument)
+        this.isInitDocument = false;
+        this.documentSelectedOrder = response.responseData;
+        this.packageDocumentSelected = [];
         this.packageDocumentSelected.push(...response.responseData.map(n => n.documentId))
-        console.log(this.packageDocumentSelected);
       }
       else{
         this.packageDocumentSelected = [];
@@ -68,9 +74,12 @@ export class DocumentSettingComponent implements OnInit {
   }
   buildSaveModel(){
     let arr = this.packageDocument.filter(n => this.packageDocumentSelected.includes(n.data));
+    const ids = arr.map(g => g.data);
+    const documentIds = this.packageDocumentSelected.filter(n => !ids.includes(n));
+
     const saveModel = arr.map(n => ({
         biddingPackageId: n.data,
-        documents: n.children.map(n => ({documentId: n.data, order : parseInt(n.order) }))
+        documents: n.children.filter(g => documentIds.includes(g.data)).map(g => ({documentId: g.data, order : parseInt(g.order) }))
     }))
     return saveModel;
   }
