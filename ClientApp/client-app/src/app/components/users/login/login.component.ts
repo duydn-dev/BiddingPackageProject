@@ -53,6 +53,9 @@ export class LoginComponent implements OnInit {
         this._spinnerService.stop();
         this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: response.message });
       }
+    },error => {
+      this._spinnerService.stop();
+      this._messageService.add({ severity: 'error', summary: 'Lỗi', detail: "Không thể connect đến server, vui lòng liên hệ quản trị viên để được hỗ trợ" });
     })
   }
 }

@@ -214,26 +214,30 @@ namespace Neac.BusinessLogic.Repository
             }
         }
 
-        public async Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, DocumentSettingCreateDto request)
+        public async Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, List<DocumentSettingCreateDto> request)
         {
             try
             {
                 var settings = await _unitOfWork.GetRepository<DocumentSetting>().DeleteByExpression(n => n.ProjectId == projectId);
-                if(request.Documents?.Count > 0)
+                foreach (var packageItem in request)
                 {
-                    foreach (var item in request.Documents)
+                    if (packageItem.Documents?.Count > 0)
                     {
-                        await _unitOfWork.GetRepository<DocumentSetting>().Add(
-                            new DocumentSetting
-                            {
-                                BiddingPackageId = request.BiddingPackageId,
-                                DocumentId = item.DocumentId,
-                                DocumentSettingId = Guid.NewGuid(),
-                                Order = item.Order,
-                                ProjectId = projectId
-                            });
+                        foreach (var item in packageItem.Documents)
+                        {
+                            await _unitOfWork.GetRepository<DocumentSetting>().Add(
+                                new DocumentSetting
+                                {
+                                    BiddingPackageId = packageItem.BiddingPackageId,
+                                    DocumentId = item.DocumentId,
+                                    DocumentSettingId = Guid.NewGuid(),
+                                    Order = item.Order,
+                                    ProjectId = projectId
+                                });
+                        }
                     }
                 }
+                
                 await _unitOfWork.SaveAsync();
                 return Response<Guid>.CreateSuccessResponse(projectId);
             }

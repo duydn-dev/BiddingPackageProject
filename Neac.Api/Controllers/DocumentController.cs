@@ -97,7 +97,7 @@ namespace Neac.Api.Controllers
         [Route("save-document-setting/{projectId}")]
         [HttpPut]
         [RoleDescription("Lưu cấu hình văn bản")]
-        public async Task<Response<Guid>> SaveDocumentSettingAsync([FromRoute]Guid projectId,  [FromBody] DocumentSettingCreateDto request)
+        public async Task<Response<Guid>> SaveDocumentSettingAsync([FromRoute]Guid projectId,  [FromBody] List<DocumentSettingCreateDto> request)
         {
             return await _documentRepository.SaveDocumentSettingAsync(projectId, request);
         }

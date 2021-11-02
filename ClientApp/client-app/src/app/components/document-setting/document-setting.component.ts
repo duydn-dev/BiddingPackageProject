@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TreeNode } from 'primeng/api';
+import { MessageService, TreeNode } from 'primeng/api';
 import { DocumentService } from 'src/app/services/document/document.service';
 
 @Component({
@@ -17,7 +17,8 @@ export class DocumentSettingComponent implements OnInit {
   ]
   constructor(
     private route: ActivatedRoute,
-    private documentService : DocumentService
+    private documentService : DocumentService,
+    private _messageService: MessageService,
   ) { }
   
   async getSettings(){
@@ -40,7 +41,9 @@ export class DocumentSettingComponent implements OnInit {
     const response = await this.documentService.getSettingSelected(this.projectId).toPromise();
     if(response.success){
       if(response.responseData.length > 0){
-        
+        console.log(this.packageDocument)
+        this.packageDocumentSelected.push(...response.responseData.map(n => n.documentId))
+        console.log(this.packageDocumentSelected);
       }
       else{
         this.packageDocumentSelected = [];
@@ -57,6 +60,7 @@ export class DocumentSettingComponent implements OnInit {
     }
   }
   checkboxChange(event, node){
+    node.isDisabled = !event.checked;
     if(!event){
       const i = this.packageDocumentSelected.findIndex(n => n.data == node.data);
       this.packageDocumentSelected.splice(i, 1);
@@ -66,14 +70,19 @@ export class DocumentSettingComponent implements OnInit {
     let arr = this.packageDocument.filter(n => this.packageDocumentSelected.includes(n.data));
     const saveModel = arr.map(n => ({
         biddingPackageId: n.data,
-        documents: n.children.map(n => n.data)
+        documents: n.children.map(n => ({documentId: n.data, order : parseInt(n.order) }))
     }))
     return saveModel;
   }
   save(){
     const model = this.buildSaveModel();
-    this.documentService.saveDocumentSetting(this.projectId, model).subscribe(n => {
-      
+    this.documentService.saveDocumentSetting(this.projectId, model).subscribe(response => {
+      if(response.success){
+        this._messageService.add({severity:'success', summary:'Thành công', detail:'chỉnh sửa người dùng thành công !'});
+      }
+      else{
+        this._messageService.add({severity:'error', summary:'Lỗi', detail: response.message});
+      }
     })
   }
   async ngOnInit(): Promise<void> {
