@@ -40,11 +40,11 @@
                     <td class="mdl-data-table__cell--non-numeric">{{item.note}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.currentState}}</td>
                     <td class="mdl-data-table__cell--non-numeric w-50px text-center">
-                        <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--raised mdl-js-ripple-effect button--colored-excuted mr-20" title="Cấu hình văn bản" [routerLink]="'/document-setting/' + item.projectId">
-                            <i class="material-icons">forward</i>
-                        </button>
-                        <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" title="Thực thi" [routerLink]="'/project-flow/' + item.projectId">
+                        <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" title="Cấu hình văn bản" [routerLink]="'/document-setting/' + item.projectId">
                             <i class="material-icons">build_circle</i>
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--raised mdl-js-ripple-effect button--colored-excuted mr-20" title="Thực thi" [routerLink]="'/project-flow/' + item.projectId">
+                            <i class="material-icons">forward</i>
                         </button>
                         <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" title="Sửa" (click)="openEditForm(item.projectId)">
                             <i class="material-icons">create</i>

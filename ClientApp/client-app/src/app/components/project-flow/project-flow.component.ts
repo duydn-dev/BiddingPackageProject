@@ -57,9 +57,6 @@ export class ProjectFlowComponent implements OnInit {
     });
     await this.initData();
   }
-  openCreatePackageForm() {
-    
-  }
   openCreateDocumentForm(flowId:any = null){
     this.documentForm.clearValidators();
     this.documentForm.reset();
@@ -157,50 +154,57 @@ export class ProjectFlowComponent implements OnInit {
     const flow = this.packages.find(n => n.biddingPackageId == this.currentPackage);
     this.isEnableCreate = (flow.currentNumberDocument == flow.totalDocument)
   }
-  async getCurrentPackage(){
-    const response = await this._flowService.currentPackage(this.projectId).toPromise();
-    if(response.success){
-      this.currentPackage = response.responseData;
-    }
-  }
-  async getPackageByProjectId() {
-    const response = await this._biddingService.getPackageProjectId(this.projectId).toPromise();
-    if (response.success) {
-      const packageConverted = response.responseData.map(n => ({
-        biddingPackageId: n.biddingPackageId,
-        label: n.biddingPackageName,
-        order: n.order,
-      }))
-      return packageConverted;
-    }
-  }
-
-  async projectCurrentState(packages){
+  // async getCurrentPackage(){
+  //   const response = await this._flowService.currentPackage(this.projectId).toPromise();
+  //   if(response.success){
+  //     this.currentPackage = response.responseData;
+  //   }
+  // }
+  async getTotalAndCompleteDocument(){
     const response = await this._flowService.projectCurrentState(this.projectId).toPromise();
-    let mappedModel = response.responseData.map(n => {
-      const temp = packages.find(g => g.biddingPackageId === n.biddingPackageId);
-      if(temp){
-        return {
-          biddingPackageId: n.biddingPackageId,
-          currentNumberDocument: n.currentNumberDocument,
-          totalDocument: n.totalDocument,
-          order: temp.order,
-          label: temp.label,
-          command: async (event: any) => {
-            this.activeIndex = (temp.order - 1);
-            this.currentPackage = n.biddingPackageId;
-            this.enableCreate();
-            await this.getFlows();
-          }
-        }
-      }
-    }).sort(function (a, b) {
-      return a.order - b.order;
-    })
-    this.packages = mappedModel;
-    const currentOrder = this.packages.find(n => n.biddingPackageId === this.currentPackage)
-    this.activeIndex = !currentOrder ? 0 : (currentOrder.order - 1)
+    if (response.success) {
+      this.packages = response.responseData;
+      console.log(this.packages);
+    }
   }
+  // async getPackageByProjectId() {
+  //   const response = await this._biddingService.getPackageProjectId(this.projectId).toPromise();
+  //   if (response.success) {
+  //     const packageConverted = response.responseData.map(n => ({
+  //       biddingPackageId: n.biddingPackageId,
+  //       label: n.biddingPackageName,
+  //       order: n.order,
+  //     }))
+  //     return packageConverted;
+  //   }
+  // }
+
+  // async projectCurrentState(packages){
+  //   const response = await this._flowService.projectCurrentState(this.projectId).toPromise();
+  //   let mappedModel = response.responseData.map(n => {
+  //     const temp = packages.find(g => g.biddingPackageId === n.biddingPackageId);
+  //     if(temp){
+  //       return {
+  //         biddingPackageId: n.biddingPackageId,
+  //         currentNumberDocument: n.currentNumberDocument,
+  //         totalDocument: n.totalDocument,
+  //         order: temp.order,
+  //         label: temp.label,
+  //         command: async (event: any) => {
+  //           this.activeIndex = (temp.order - 1);
+  //           this.currentPackage = n.biddingPackageId;
+  //           this.enableCreate();
+  //           await this.getFlows();
+  //         }
+  //       }
+  //     }
+  //   }).sort(function (a, b) {
+  //     return a.order - b.order;
+  //   })
+  //   this.packages = mappedModel;
+  //   const currentOrder = this.packages.find(n => n.biddingPackageId === this.currentPackage)
+  //   this.activeIndex = !currentOrder ? 0 : (currentOrder.order - 1)
+  // }
   async getFlows(){
     const request = {
       projectId: this.projectId,
@@ -244,10 +248,11 @@ export class ProjectFlowComponent implements OnInit {
     }
   }
   async initData(){
-    await this.getCurrentPackage();
-    await this.projectCurrentState(await this.getPackageByProjectId());
-    await this.getFlows();
-    await this.getDropDownDocument();
-    this.enableCreate();
+    //await this.getCurrentPackage();
+    //await this.projectCurrentState(await this.getPackageByProjectId());
+    //await this.getFlows();
+    //await this.getDropDownDocument();
+    //this.enableCreate();
+    await this.getTotalAndCompleteDocument();
   }
 }

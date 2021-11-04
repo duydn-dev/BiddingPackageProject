@@ -218,28 +218,31 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
-                var settings = await _unitOfWork.GetRepository<DocumentSetting>().DeleteByExpression(n => n.ProjectId == projectId);
-                foreach (var packageItem in request)
+                if(request.Count > 0)
                 {
-                    if (packageItem.Documents?.Count > 0)
+                    var settings = await _unitOfWork.GetRepository<DocumentSetting>().DeleteByExpression(n => n.ProjectId == projectId);
+                    foreach (var packageItem in request)
                     {
-                        foreach (var item in packageItem.Documents)
+                        if (packageItem.Documents?.Count > 0)
                         {
-                            await _unitOfWork.GetRepository<DocumentSetting>().Add(
-                                new DocumentSetting
-                                {
-                                    BiddingPackageId = packageItem.BiddingPackageId,
-                                    DocumentId = item.DocumentId,
-                                    DocumentSettingId = Guid.NewGuid(),
-                                    Order = item.Order,
-                                    ProjectId = projectId
-                                });
+                            foreach (var item in packageItem.Documents)
+                            {
+                                await _unitOfWork.GetRepository<DocumentSetting>().Add(
+                                    new DocumentSetting
+                                    {
+                                        BiddingPackageId = packageItem.BiddingPackageId,
+                                        DocumentId = item.DocumentId,
+                                        DocumentSettingId = Guid.NewGuid(),
+                                        Order = item.Order,
+                                        ProjectId = projectId
+                                    });
+                            }
                         }
                     }
+                    await _unitOfWork.SaveAsync();
+                    return Response<Guid>.CreateSuccessResponse(projectId);
                 }
-                
-                await _unitOfWork.SaveAsync();
-                return Response<Guid>.CreateSuccessResponse(projectId);
+              return Response<Guid>.CreateErrorResponse(new Exception("Danh sách cấu hình văn bản bị trống !"));
             }
             catch (Exception ex)
             {

@@ -111,16 +111,16 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
-                var documents = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null && n.IsCommon.Value).CountAsync();
-                var q1 = from bdp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
-                          join d in _unitOfWork.GetRepository<Document>().GetAll() on bdp.BiddingPackageId equals d.BiddingPackageId into grDoc from grData in grDoc.DefaultIfEmpty()
-                          where bdp.ProjectId == projectId
-                          select new { BiddingPackageId = bdp.BiddingPackageId, DocumentId = (grData == null) ? Guid.Empty: grData.DocumentId };
+                //var documents = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null && n.IsCommon.Value).CountAsync();
+                //var q1 = from bdp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
+                //          join d in _unitOfWork.GetRepository<Document>().GetAll() on bdp.BiddingPackageId equals d.BiddingPackageId into grDoc from grData in grDoc.DefaultIfEmpty()
+                //          where bdp.ProjectId == projectId
+                //          select new { BiddingPackageId = bdp.BiddingPackageId, DocumentId = (grData == null) ? Guid.Empty: grData.DocumentId };
 
-                var query = await (q1.GroupBy(n => n.BiddingPackageId, (key, data) => new {
-                    BiddingPackageId = key,
-                    NumberDocument = data.Count(g => g.DocumentId != Guid.Empty) + documents
-                })).ToListAsync();
+                //var query = await (q1.GroupBy(n => n.BiddingPackageId, (key, data) => new {
+                //    BiddingPackageId = key,
+                //    NumberDocument = data.Count(g => g.DocumentId != Guid.Empty) + documents
+                //})).ToListAsync();
 
                 //var query = await _unitOfWork.GetRepository<BiddingPackage>().GetAll()
                 //.Include(n => n.BiddingPackageProjects.OrderBy(g => g.Order))
@@ -133,16 +133,49 @@ namespace Neac.BusinessLogic.Repository
                 //})
                 //.ToListAsync();
 
-                var data = query.GroupJoin(
-                    _unitOfWork.GetRepository<ProjectFlow>().GetAll().Where(n => n.ProjectId == projectId),
-                    l => l.BiddingPackageId,
-                    r => r.BiddingPackageId,
-                    (l, r) => new ProjectFlowCurrentDto
-                    {
-                        BiddingPackageId = l.BiddingPackageId,
-                        TotalDocument = l.NumberDocument,
-                        CurrentNumberDocument = r.Count()
-                    }).ToList();
+                //var data = query.GroupJoin(
+                //    _unitOfWork.GetRepository<ProjectFlow>().GetAll().Where(n => n.ProjectId == projectId),
+                //    l => l.BiddingPackageId,
+                //    r => r.BiddingPackageId,
+                //    (l, r) => new ProjectFlowCurrentDto
+                //    {
+                //        BiddingPackageId = l.BiddingPackageId,
+                //        TotalDocument = l.NumberDocument,
+                //        CurrentNumberDocument = r.Count()
+                //    }).ToList();
+
+                // lấy ra số văn bản cần nhập
+                var joined = await (from bp in _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId)
+
+                                    join b in _unitOfWork.GetRepository<BiddingPackage>().GetAll() on bp.BiddingPackageId equals b.BiddingPackageId
+
+                                    join ds in _unitOfWork.GetRepository<DocumentSetting>().GetByExpression(n => n.ProjectId == projectId) on b.BiddingPackageId equals ds.BiddingPackageId
+                                    into gr from grData in gr.DefaultIfEmpty()
+
+                                    select new { bp.BiddingPackageId, bp.Order, b.BiddingPackageName, grData.DocumentId })
+                               .GroupBy(n => new { n.BiddingPackageId, n.Order, n.BiddingPackageName }, (key, documentIds) => new {
+                                   key.BiddingPackageId,
+                                   key.Order,
+                                   key.BiddingPackageName,
+                                   DocumentCount = documentIds.Count(g => g.DocumentId.HasValue)
+                               })
+                              .OrderBy(n => n.Order)
+                              .ToListAsync();
+
+                // lấy ra văn bản đã nhập
+                var data = joined.GroupJoin(
+                        _unitOfWork.GetRepository<ProjectFlow>().GetByExpression(n => n.ProjectId == projectId),
+                        left => left.BiddingPackageId,
+                        right => right.BiddingPackageId,
+                        (key, data) => new ProjectFlowCurrentDto {
+                            BiddingPackageId = key.BiddingPackageId,
+                            BiddingPackageName = key.BiddingPackageName,
+                            Order = key.Order,
+                            DocumentCount = key.DocumentCount,
+                            CurrentDocumentCount = data.Count()
+                        }
+                    ).ToList();
+
                 return Response<List<ProjectFlowCurrentDto>>.CreateSuccessResponse(data);
             }
             catch (Exception ex)

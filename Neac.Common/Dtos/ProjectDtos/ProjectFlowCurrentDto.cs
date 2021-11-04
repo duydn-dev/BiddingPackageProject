@@ -9,8 +9,10 @@ namespace Neac.Common.Dtos.ProjectDtos
     public class ProjectFlowCurrentDto
     {
         public Guid? BiddingPackageId { get; set; }
-        public int? TotalDocument { get; set; }
-        public int? CurrentNumberDocument { get; set; }
+        public string BiddingPackageName { get; set; }
+        public int? Order { get; set; }
+        public int? DocumentCount { get; set; }
+        public int? CurrentDocumentCount { get; set; }
     }
     public class ProjectFlowCreateDto
     {
