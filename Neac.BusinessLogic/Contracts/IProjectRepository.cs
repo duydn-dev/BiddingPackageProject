@@ -14,6 +14,7 @@ namespace Neac.BusinessLogic.Contracts
         Task<Response<ProjectGetListDto>> GetByIdAsync(Guid projectId);
         Task<Response<ProjectGetListDto>> CreateAsync(ProjectGetListDto request);
         Task<Response<ProjectGetListDto>> UpdateAsync(ProjectGetListDto request);
-        Task<Response<bool>> DeleteAsync(Guid projectId);
+        Task<Response<bool>> DeleteAsync(Guid projectId); 
+        Task<Response<IEnumerable<ExportDataDto>>> GetExportDataAsync(Guid projectId);
     }
 }

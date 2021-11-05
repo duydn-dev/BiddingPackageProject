@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { BiddingService } from 'src/app/services/bidding-package/bidding-package.service';
 import { ProjectService } from 'src/app/services/project/project.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-project',
@@ -70,9 +71,8 @@ export class ProjectComponent implements OnInit {
     this.getFilter();
   }
   exportExcel(projectId:any){
-    this._projectService.getById(projectId).subscribe(response => {
-
-    });
+    var downloadURL = `${environment.apiUrl}/api/project/export-excel/${projectId}`;
+    window.open(downloadURL);
   }
   openEditForm(projectId:any = null){
     this.projectForm.reset();

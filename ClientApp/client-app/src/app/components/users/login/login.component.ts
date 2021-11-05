@@ -31,6 +31,10 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    const user:any = JSON.parse(localStorage.getItem('user'));
+    if(user && user != "null" && new Date(user.user.expire) >= new Date()){
+      this._router.navigate(["/"]);
+    }
     this.loginForm = this._fb.group({
       userName: this._fb.control(null, [Validators.required]),
       passWord: this._fb.control(null, [Validators.required]),

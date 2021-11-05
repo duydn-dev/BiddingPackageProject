@@ -23,7 +23,6 @@ export class DashboardComponent implements OnInit {
   }
   skip(number){
     const data = this.customers.filter((e,i) => i >= number).slice(number, this.pageSize);
-    console.log(data)
   }
   getData(){
     let skip = (this.pageSize * (this.pageIndex - 1));

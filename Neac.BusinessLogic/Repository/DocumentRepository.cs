@@ -133,18 +133,32 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
+                 //lấy ra những thằng đã nhập
                 var listImported = await _unitOfWork.GetRepository<ProjectFlow>()
                     .GetByExpression(n => n.ProjectId == request.ProjectId && n.BiddingPackageId == request.PackageId)
                     .Select(n => n.DocumentId)
                     .ToListAsync();
-                //var documents = await _unitOfWork.GetRepository<Document>()
-                //    .GetByExpression(n => (n.IsCommon.Value && n.BiddingPackageId == null) || n.BiddingPackageId == request.PackageId)
-                //    .WhereIf(listImported.Count > 0, n => !listImported.Contains(n.DocumentId))
-                //    .ToListAsync();
-                var document = await _unitOfWork.GetRepository<Document>()
-                    .GetByExpression(n => (n.IsCommon.Value && n.BiddingPackageId == null) || n.BiddingPackageId == request.PackageId)
-                    //.WhereIf(listImported.Count > 0, n => !listImported.Contains(n.DocumentId))
+
+                //lấy ra những thằng phải nhập
+                var mustImport = await _unitOfWork.GetRepository<DocumentSetting>()
+                    .GetByExpression(n => n.BiddingPackageId == request.PackageId && n.ProjectId == request.ProjectId)
+                    .Select(n => n.DocumentId)
                     .ToListAsync();
+
+                // lấy ra những thằng chưa nhập
+                var notImport = mustImport.Except(listImported).Union(listImported.Except(mustImport));
+
+                var document = await (from d in _unitOfWork.GetRepository<Document>().GetAll()
+                                      join ds in _unitOfWork.GetRepository<DocumentSetting>().GetAll() on d.DocumentId equals ds.DocumentId
+                                      where ds.ProjectId == request.ProjectId && ds.BiddingPackageId == request.PackageId
+                                      select new Document
+                                      {
+                                          BiddingPackageId = d.BiddingPackageId,
+                                          DocumentId = d.DocumentId,
+                                          DocumentName = $"{ds.Order}. {d.DocumentName}",
+                                          IsCommon = d.IsCommon,
+                                          Note = d.Note
+                                      }).ToListAsync();
                 return Response<List<Document>>.CreateSuccessResponse(document, listImported);
             }
             catch(Exception ex)

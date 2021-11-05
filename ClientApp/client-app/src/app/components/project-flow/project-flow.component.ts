@@ -62,6 +62,7 @@ export class ProjectFlowComponent implements OnInit {
     this.documentForm.reset();
     this.isShowModal = true;
     this.file = null;
+    this.isSubmit = false;
     this.input.nativeElement.value = null;
     if(flowId){
       this._flowService.getFlowById(flowId).subscribe(response => {
@@ -152,59 +153,32 @@ export class ProjectFlowComponent implements OnInit {
   }
   enableCreate(){
     const flow = this.packages.find(n => n.biddingPackageId == this.currentPackage);
-    this.isEnableCreate = (flow.currentNumberDocument == flow.totalDocument)
+    this.isEnableCreate = ((flow.currentDocumentCount == flow.documentCount) && (flow.documentCount == 0))
   }
-  // async getCurrentPackage(){
-  //   const response = await this._flowService.currentPackage(this.projectId).toPromise();
-  //   if(response.success){
-  //     this.currentPackage = response.responseData;
-  //   }
-  // }
   async getTotalAndCompleteDocument(){
     const response = await this._flowService.projectCurrentState(this.projectId).toPromise();
     if (response.success) {
-      this.packages = response.responseData;
-      console.log(this.packages);
+      this.packages = response.responseData.map(n => ({
+        biddingPackageId: n.biddingPackageId,
+        currentDocumentCount: n.currentDocumentCount,
+        documentCount: n.documentCount,
+        order: n.order,
+        label: n.biddingPackageName,
+        command: async (event: any) => {
+          this.activeIndex = (n.order - 1);
+          this.currentPackage = n.biddingPackageId;
+          this.enableCreate();
+          await this.getDropDownDocument();
+          await this.getFlows();
+        }
+      }));
+      this.currentPackage = response.otherData.currentPackageId;
+      this.activeIndex = (response.otherData.order - 1);
+      this.enableCreate();
+      await this.getFlows();
     }
   }
-  // async getPackageByProjectId() {
-  //   const response = await this._biddingService.getPackageProjectId(this.projectId).toPromise();
-  //   if (response.success) {
-  //     const packageConverted = response.responseData.map(n => ({
-  //       biddingPackageId: n.biddingPackageId,
-  //       label: n.biddingPackageName,
-  //       order: n.order,
-  //     }))
-  //     return packageConverted;
-  //   }
-  // }
 
-  // async projectCurrentState(packages){
-  //   const response = await this._flowService.projectCurrentState(this.projectId).toPromise();
-  //   let mappedModel = response.responseData.map(n => {
-  //     const temp = packages.find(g => g.biddingPackageId === n.biddingPackageId);
-  //     if(temp){
-  //       return {
-  //         biddingPackageId: n.biddingPackageId,
-  //         currentNumberDocument: n.currentNumberDocument,
-  //         totalDocument: n.totalDocument,
-  //         order: temp.order,
-  //         label: temp.label,
-  //         command: async (event: any) => {
-  //           this.activeIndex = (temp.order - 1);
-  //           this.currentPackage = n.biddingPackageId;
-  //           this.enableCreate();
-  //           await this.getFlows();
-  //         }
-  //       }
-  //     }
-  //   }).sort(function (a, b) {
-  //     return a.order - b.order;
-  //   })
-  //   this.packages = mappedModel;
-  //   const currentOrder = this.packages.find(n => n.biddingPackageId === this.currentPackage)
-  //   this.activeIndex = !currentOrder ? 0 : (currentOrder.order - 1)
-  // }
   async getFlows(){
     const request = {
       projectId: this.projectId,
@@ -254,5 +228,6 @@ export class ProjectFlowComponent implements OnInit {
     //await this.getDropDownDocument();
     //this.enableCreate();
     await this.getTotalAndCompleteDocument();
+    await this.getDropDownDocument();
   }
 }

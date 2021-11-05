@@ -1,0 +1,47 @@
+-- PROCEDURE: public.addcongdanv2(text, integer, text, date, text, integer, text, text, integer, bigint, text, smallint)
+
+-- DROP PROCEDURE public.addcongdanv2(text, integer, text, date, text, integer, text, text, integer, bigint, text, smallint);
+
+ALTER PROCEDURE public.addcongdanv2(
+	INOUT sysidout text,
+	machineid integer,
+	hoten text,
+	ngaysinh date,
+	sogiayto text,
+	loaigiayto integer,
+	sodienthoai text,
+	nguon text,
+	gioitinh integer,
+	qidkhaiho bigint,
+	hovatencodau text,
+	trangthai smallint)
+LANGUAGE 'plpgsql'
+AS $BODY$
+DECLARE
+        sys_id bigint ;   
+       time_component bigint;    
+BEGIN 
+	SELECT FLOOR(EXTRACT(EPOCH FROM clock_timestamp())) INTO time_component;
+   SELECT generate_object_id_bigint(machineid, time_component) INTO sys_id;
+   INSERT INTO "CongDan" ("MaDinhDanh" ,"PhienBan","HoVaTen"  ,"SoGiayTo","NgaySinh", "ThoiGian", "LoaiDinhDanh", "NhomMau", "DanToc", "TonGiao","XacMinhBCA","SoDienThoai","Nguon", "GioiTinh", "QIDKhaiHo", "HoVaTenCoDau", "TrangThai") VALUES   
+    (sys_id,  
+     1,
+     hoten, 
+     sogiayto,
+     ngaysinh,
+     time_component,
+     loaigiayto,
+	 0,
+	 0,
+	 0,
+	 4,
+	 sodienthoai,
+	 nguon,
+	 gioitinh,
+	 qidkhaiho,
+	 hovatencodau,
+	 trangthai
+    ) RETURNING sys_id into sysidout;  
+  
+END
+$BODY$;

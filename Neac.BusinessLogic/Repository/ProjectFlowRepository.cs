@@ -41,64 +41,46 @@ namespace Neac.BusinessLogic.Repository
             {
                 // kiểm tra gói thầu hiện tại đã đủ văn bản chưa
                 var projectFlow = JsonConvert.DeserializeObject<ProjectFlowCreateDto>(_httpContextAccessor.HttpContext.Request.Form["projectFlow"].ToString());
-                var documentCommon = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null && n.IsCommon.Value).CountAsync();
-                projectFlow.ProjectDate = projectFlow.ProjectDate.Value.AddDays(1);
-                var countDocumennt = await (from b in _unitOfWork.GetRepository<BiddingPackage>().GetAll()
-                        join d in _unitOfWork.GetRepository<Document>().GetAll() on b.BiddingPackageId equals d.BiddingPackageId
-                        where b.BiddingPackageId == projectFlow.BiddingPackageId
-                        group b by b.BiddingPackageId into gr
-                        select gr.Count()).FirstOrDefaultAsync();
-
-                var commondocumentCount = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.IsCommon.Value && n.BiddingPackageId == null).CountAsync();
-                var countCurrentDocument = await _unitOfWork.GetRepository<ProjectFlow>().GetAll()
-                    .Where(n => n.ProjectId == projectFlow.ProjectId && n.BiddingPackageId == projectFlow.BiddingPackageId)
-                    .CountAsync();
-                if((countDocumennt + commondocumentCount) == countCurrentDocument)
+                var countData = await CurrentState(projectFlow.ProjectId.Value);
+                var currentPackageCount = countData.ResponseData.FirstOrDefault(n => n.BiddingPackageId == projectFlow.BiddingPackageId);
+                if(currentPackageCount?.CurrentDocumentCount >= currentPackageCount?.DocumentCount)
                 {
-                    return Response<ProjectFlow>.CreateErrorResponse(new Exception($"Đã đủ văn bản trong gói thầu"));
+                    await _logRepository.ErrorAsync("Gói thầu đã đủ văn bản !");
+                    return Response<ProjectFlow>.CreateErrorResponse(new Exception("Gói thầu đã đủ văn bản !"));
                 }
 
-                // kiểm tra có phải gói thầu cuối không, nếu có đếm số lượng văn bản phải nhập và văn bản đã nhập, nếu văn bản đã nhập = tổng văn bản => update current state project = 1
-                var totalDocumentByProject = await (from bpp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
-                                                    join d in _unitOfWork.GetRepository<Document>().GetAll() on bpp.BiddingPackageId equals d.BiddingPackageId into gr from grData in gr.DefaultIfEmpty()
-                                                    where bpp.ProjectId == projectFlow.ProjectId
-                                                    orderby bpp.Order ascending
-                                                    select new {
-                                                        BiddingPackageId = bpp.BiddingPackageId,
-                                                        Order = bpp.Order, 
-                                                        DocumentId = (grData == null) ? Guid.Empty : grData.DocumentId }
-                                                ).ToListAsync();
+                if (_httpContextAccessor.HttpContext.Request.Form.Files?.Count > 0)
+                {
+                    var file = _httpContextAccessor.HttpContext.Request.Form.Files[0];
+                    string filePath = null;
+                    if (file != null)
+                    {
+                        filePath = await UploadFile(file);
+                        projectFlow.FileUrl = filePath;
+                    }
+                }
 
-                var maxOrder = totalDocumentByProject
-                    .Where(n => n.Order == totalDocumentByProject.Max(n => n.Order))
-                    .GroupBy(n => new { n.BiddingPackageId, n.Order }, (key, value) => new {
-                        key.BiddingPackageId,
-                        LastPackageDocumentCount = value.Count(g => g.DocumentId != Guid.Empty)
-                    }).FirstOrDefault();
+                // tìm kiếm package chưa set văn bản 
+                var isUnsetDocument = countData.ResponseData.Count(n => n.DocumentCount == 0);
+                if(isUnsetDocument <= 0)
+                {
+                    // nếu không có thì so sánh tổng đã nhập + 1 và tổng phải nhập văn bản của project hiện tại
+                    var totalDocument = countData.ResponseData.Select(n => n.DocumentCount).Sum();
+                    var totalImported = countData.ResponseData.Select(n => n.CurrentDocumentCount).Sum() + 1;
+                    if(totalDocument == totalImported)
+                    {
+                        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
+                        projectInfo.CurrentState = ProjectState.Excuted;
+                        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
+                    }
+                }
 
-                //if(projectFlow.BiddingPackageId == maxOrder.BiddingPackageId)
-                //{
-                //    if((countCurrentDocument + 1) == (maxOrder.LastPackageDocumentCount + documentCommon))
-                //    {
-                //        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
-                //        projectInfo.CurrentState = ProjectState.Excuted;
-                //        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
-                //    }
-                //}
-                //if (_httpContextAccessor.HttpContext.Request.Form.Files?.Count > 0)
-                //{
-                //    var file = _httpContextAccessor.HttpContext.Request.Form.Files[0];
-                //    string filePath = null;
-                //    if (file != null)
-                //    {
-                //        filePath = await UploadFile(file);
-                //        projectFlow.FileUrl = filePath;
-                //    }
-                //}
-                //projectFlow.ProjectFlowId = Guid.NewGuid();
-                //var request = _mapper.Map<ProjectFlowCreateDto, ProjectFlow>(projectFlow);
-                //await _unitOfWork.GetRepository<ProjectFlow>().Add(request);
-                //await _unitOfWork.SaveAsync();
+                projectFlow.ProjectFlowId = Guid.NewGuid();
+                projectFlow.ProjectDate = projectFlow.ProjectDate.Value.AddDays(1);
+                var request = _mapper.Map<ProjectFlowCreateDto, ProjectFlow>(projectFlow);
+                await _unitOfWork.GetRepository<ProjectFlow>().Add(request);
+                await _unitOfWork.SaveAsync();
+
                 return Response<ProjectFlow>.CreateSuccessResponse(new ProjectFlow());
             }
             catch (Exception ex)
@@ -111,39 +93,6 @@ namespace Neac.BusinessLogic.Repository
         {
             try
             {
-                //var documents = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null && n.IsCommon.Value).CountAsync();
-                //var q1 = from bdp in _unitOfWork.GetRepository<BiddingPackageProject>().GetAll()
-                //          join d in _unitOfWork.GetRepository<Document>().GetAll() on bdp.BiddingPackageId equals d.BiddingPackageId into grDoc from grData in grDoc.DefaultIfEmpty()
-                //          where bdp.ProjectId == projectId
-                //          select new { BiddingPackageId = bdp.BiddingPackageId, DocumentId = (grData == null) ? Guid.Empty: grData.DocumentId };
-
-                //var query = await (q1.GroupBy(n => n.BiddingPackageId, (key, data) => new {
-                //    BiddingPackageId = key,
-                //    NumberDocument = data.Count(g => g.DocumentId != Guid.Empty) + documents
-                //})).ToListAsync();
-
-                //var query = await _unitOfWork.GetRepository<BiddingPackage>().GetAll()
-                //.Include(n => n.BiddingPackageProjects.OrderBy(g => g.Order))
-                //.Include(n => n.Documents)
-                //.Where(n => n.BiddingPackageProjects.Any(n => n.ProjectId == projectId))
-                //.Select(n => new BiddingPackageTotalDocumentDto
-                //{
-                //    BiddingPackageId = n.BiddingPackageId,
-                //    NumberDocument = n.Documents.Count + documents
-                //})
-                //.ToListAsync();
-
-                //var data = query.GroupJoin(
-                //    _unitOfWork.GetRepository<ProjectFlow>().GetAll().Where(n => n.ProjectId == projectId),
-                //    l => l.BiddingPackageId,
-                //    r => r.BiddingPackageId,
-                //    (l, r) => new ProjectFlowCurrentDto
-                //    {
-                //        BiddingPackageId = l.BiddingPackageId,
-                //        TotalDocument = l.NumberDocument,
-                //        CurrentNumberDocument = r.Count()
-                //    }).ToList();
-
                 // lấy ra số văn bản cần nhập
                 var joined = await (from bp in _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId)
 
@@ -174,9 +123,25 @@ namespace Neac.BusinessLogic.Repository
                             DocumentCount = key.DocumentCount,
                             CurrentDocumentCount = data.Count()
                         }
-                    ).ToList();
+                    ).OrderBy(n => n.Order).ToList();
 
-                return Response<List<ProjectFlowCurrentDto>>.CreateSuccessResponse(data);
+                // lấy ra package hiện tại
+                Guid currentPackageId = new Guid();
+                int order = 0;
+                foreach (var item in data)
+                {
+                    if (
+                        (item.DocumentCount == 0 && item.CurrentDocumentCount == 0) ||
+                        (item.CurrentDocumentCount < item.DocumentCount)
+                    )
+                    {
+                        currentPackageId = item.BiddingPackageId.Value;
+                        order = item.Order.Value;
+                        break;
+                    }
+                }
+
+                return Response<List<ProjectFlowCurrentDto>>.CreateSuccessResponse(data, new { currentPackageId, order });
             }
             catch (Exception ex)
             {

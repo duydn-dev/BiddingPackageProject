@@ -14,14 +14,17 @@
                                         <div class="package-number">{{item.order}}</div>
                                     </div>
                                     <div class="bd-highlight">
-                                        <div class="package-name">{{item.biddingPackageName}}</div>
-                                        <small class="pl-10px" *ngIf="item.currentNumberDocument == item.totalDocument">
+                                        <div class="package-name">{{item.label}}</div>
+                                        <small class="pl-10px" *ngIf="(item.currentDocumentCount == item.documentCount) && (item.documentCount != 0)">
                                             <span class="text-success">
                                                 <span class="material-icons" style="font-size: 16px;">check_circle</span>
                                             </span>
                                         </small>
-                                        <small class="pl-10px" *ngIf="item.currentNumberDocument != item.totalDocument">
-                                            <span class="text-danger">{{item.currentNumberDocument +"/"+ item.totalDocument}}</span> văn bản đã nhập</small>
+                                        <small class="pl-10px" *ngIf="(item.currentDocumentCount != item.documentCount) && (item.documentCount != 0)">
+                                            <span class="text-danger">{{item.currentDocumentCount +"/"+ item.documentCount}}</span> văn bản đã nhập</small>
+
+                                        <small class="pl-10px" *ngIf="(item.currentDocumentCount == 0 && item.documentCount == 0)">
+                                            <span class="text-danger">chưa cài đặt văn bản </span></small>
                                     </div>
                                 </div>
                             </div>

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Neac.BusinessLogic.Contracts;
 using Neac.BusinessLogic.UnitOfWork;
 using Neac.Common;
+using Neac.Common.Const;
 using Neac.Common.Dtos;
 using Neac.Common.Dtos.BiddingPackage;
 using Neac.Common.Dtos.ProjectDtos;
@@ -21,11 +23,13 @@ namespace Neac.BusinessLogic.Repository
         private readonly ILogRepository _logRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public ProjectRepository(ILogRepository logRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ProjectRepository(ILogRepository logRepository, IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _logRepository = logRepository;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<Response<GetListResponseModel<List<ProjectGetListDto>>>> GetFilter(string filter)
         {
@@ -143,6 +147,89 @@ namespace Neac.BusinessLogic.Repository
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<bool>.CreateErrorResponse(ex);
+            }
+        }
+        public async Task<Response<IEnumerable<ExportDataDto>>> GetExportDataAsync(Guid projectId)
+        {
+            try
+            {
+                string host = _httpContextAccessor.HttpContext.Request.Host.Value;
+                List<ExportDataDto> exportDataDtos = new List<ExportDataDto>();
+                var mustImported = await (from bd in _unitOfWork.GetRepository<BiddingPackage>().GetAll()
+                                          join bpp in _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId) on bd.BiddingPackageId equals bpp.BiddingPackageId
+                                          join ds in _unitOfWork.GetRepository<DocumentSetting>().GetByExpression(n => n.ProjectId == projectId) on bpp.BiddingPackageId equals ds.BiddingPackageId into gr
+                                          from grData in gr.DefaultIfEmpty()
+                                          select new
+                                          {
+                                              BiddingPackageId = bd.BiddingPackageId,
+                                              BiddingPackageName = bd.BiddingPackageName,
+                                              DocumentId = grData.DocumentId,
+                                              Order = grData.Order
+                                          }).ToListAsync();
+
+                var imported = await (from pf in _unitOfWork.GetRepository<ProjectFlow>().GetAll()
+                                      join d in _unitOfWork.GetRepository<Document>().GetAll() on pf.DocumentId equals d.DocumentId
+                                      where pf.ProjectId == projectId
+                                      select new
+                                      {
+                                          DocumentName = d.DocumentName,
+                                          ProjectFlowId = pf.ProjectFlowId,
+                                          DocumentNumber = pf.DocumentNumber,
+                                          ProjectDate = pf.ProjectDate,
+                                          PromulgateUnit = pf.PromulgateUnit,
+                                          DocumentAbstract = pf.DocumentAbstract,
+                                          Signer = pf.Signer,
+                                          RegulationDocument = pf.RegulationDocument,
+                                          FileUrl = pf.FileUrl,
+                                          Note = pf.Note,
+                                          Status = pf.Status,
+                                          BiddingPackageId = pf.BiddingPackageId,
+                                          ProjectId = pf.ProjectId,
+                                          DocumentId = pf.DocumentId
+                                      }).ToListAsync();
+
+                var result = (from m in mustImported
+                              join i in imported on m.DocumentId equals i.DocumentId into gr
+                              from grData in gr.DefaultIfEmpty()
+                              select new
+                              {
+                                  BiddingPackageName = m.BiddingPackageName,
+                                  DocumentName = grData?.DocumentName,
+                                  DocumentNumber = grData?.DocumentNumber,
+                                  ProjectDate = grData?.ProjectDate,
+                                  PromulgateUnit = grData?.PromulgateUnit,
+                                  DocumentAbstract = grData?.DocumentAbstract,
+                                  Signer = grData?.Signer,
+                                  RegulationDocument = grData?.RegulationDocument,
+                                  FileUrl = grData?.FileUrl,
+                                  Note = grData?.Note,
+                                  Status = grData?.Status,
+                                  DocumentId = grData?.DocumentId
+                              }).GroupBy(n => n.BiddingPackageName, (key, val) => new ExportDataDto
+                              {
+                                  BiddingPackageName = key,
+                                  Documents = val.Where(g => g.DocumentId != null).Select((g, i) => new ProjectFlowExportDto
+                                  {
+                                      Index = i + 1,
+                                      DocumentName = g.DocumentName,
+                                      DocumentNumber = g.DocumentNumber,
+                                      ProjectDate = g.ProjectDate.Value.ToString("dd/MM/yyyy"),
+                                      PromulgateUnit = g.PromulgateUnit,
+                                      DocumentAbstract = g.DocumentAbstract,
+                                      Signer = g.Signer,
+                                      RegulationDocument = g.RegulationDocument,
+                                      FileUrl = host + "/" + g.FileUrl.Replace("\\", "/"),
+                                      Note = g.Note,
+                                      Status = CommonFunction.DocumentStateName(g.Status)
+                                  }).ToList()
+                              });
+
+                return Response<IEnumerable<ExportDataDto>>.CreateSuccessResponse(result);
+            }
+            catch (Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<IEnumerable<ExportDataDto>>.CreateErrorResponse(ex);
             }
         }
     }

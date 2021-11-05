@@ -8,6 +8,12 @@ namespace Neac.Common.Const
 {
     public static class CommonConstant
     {
+        public enum DocumentState
+        {
+            NotHad = 0,
+            Had = 1,
+            Edited = 2
+        }
     }
     public static class UserStatus
     {
