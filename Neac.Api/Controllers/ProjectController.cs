@@ -12,6 +12,7 @@ using Neac.Common.Dtos.ProjectDtos;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -70,16 +71,16 @@ namespace Neac.Api.Controllers
                         // draw template
                         for (int i = 0; i < responseData.Count(); i++)
                         {
-                            Worksheet worksheet = workbook.Worksheets[workbook.Worksheets.Add()];
+                            Worksheet worksheet = (i > 0) ? workbook.Worksheets[workbook.Worksheets.Add()]: workbook.Worksheets[0];
                             worksheet.Name = responseData[i].BiddingPackageName;
-
+                            
                             DataTable data = responseData[i].Documents.RenameHeaderAndConvertToDatatable(new List<string> {
                                 "STT",
-                                "Tên Văn Bản",
-                                "Số Hiệu",
-                                "Ngày Ký",
-                                "Đơn Vị Cung Cấp",
-                                "Tóm Tắt",
+                                "Tên văn bản",
+                                "Số hiệu",
+                                "Ngày ký",
+                                "Đơn vị cung cấp",
+                                "Tóm tắt",
                                 "Người ký",
                                 "Văn bản quy định",
                                 "Đường dẫn File",
@@ -87,12 +88,30 @@ namespace Neac.Api.Controllers
                                 "Tình trạng"
                             });
                             worksheet.Cells.ImportDataTable(data, true, "A1");
+                            worksheet.AutoFitColumns();
+
+                            Aspose.Cells.Range range = worksheet.Cells.CreateRange(0, 0, worksheet.Cells.Rows.Count, worksheet.Cells.Columns.Count);
+                            Style style = workbook.CreateStyle();
+                            style.SetBorder(BorderType.LeftBorder, CellBorderType.Thin, Color.Black);
+                            style.SetBorder(BorderType.RightBorder, CellBorderType.Thin, Color.Black);
+                            style.SetBorder(BorderType.TopBorder, CellBorderType.Thin, Color.Black);
+                            style.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.Black);
+                            style.Font.Name = "Times New Roman";
+                            range.SetStyle(style);
+                            if (worksheet.Cells.Rows.Count > 0)
+                            {
+                                Aspose.Cells.Range range2 = worksheet.Cells.CreateRange(0, 0, 1, worksheet.Cells.Columns.Count);
+                                Style headerStyle = workbook.CreateStyle();
+                                headerStyle.Font.IsBold = true;
+                                range2.SetStyle(headerStyle);
+                            }
                         }
-                        using (MemoryStream memoryStream = new MemoryStream())
-                        {
-                            workbook.Save(memoryStream, SaveFormat.Xlsx);
-                            return File(memoryStream, "application/octet-stream");
-                        }
+                        MemoryStream memoryStream = new MemoryStream();
+                        workbook.Save(memoryStream, SaveFormat.Xlsx);
+                        var by = memoryStream.ToArray();
+                        await memoryStream.DisposeAsync();
+                        memoryStream.Close();
+                        return File(by, "application/octet-stream", "export-data.xlsx");
                     }
                     return NotFound();
                 }
