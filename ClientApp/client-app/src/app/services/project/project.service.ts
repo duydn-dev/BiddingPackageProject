@@ -29,4 +29,7 @@ export class ProjectService {
   exportExcel(projectId:any){
     return this._baseService.get('api/project/export-excel', projectId);
   }
+  getStatistical(){
+    return this._baseService.get('api/project/get-project-statistical');
+  }
 }

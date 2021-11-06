@@ -63,5 +63,14 @@ namespace Neac.Common.Const
             }
             return name;
         }
+        public static double ValidRatio(double? divisor, double? dividend)
+        {
+            if((!dividend.HasValue && !dividend.HasValue) || (divisor != 0 && dividend == 0))
+            {
+                return 0;
+            }
+            var result = (divisor / dividend) * 100;
+            return (result > 100) ? 100 : (result < 0) ? 0 : Math.Round(result.Value, 2);
+        }
     }
 }

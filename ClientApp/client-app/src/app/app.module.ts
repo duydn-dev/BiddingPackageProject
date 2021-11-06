@@ -13,6 +13,7 @@ import {metaReducers, reducers} from '../app/ngrx/index';
 // primNG module
 import {MessageService, ConfirmationService, TreeNode} from 'primeng/api';
 import { PrimeNgModule } from './modules/primeng.module';
+import {ChartModule} from 'primeng/chart';
 
 // component
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -55,6 +56,7 @@ import { DocumentSettingComponent } from './components/document-setting/document
     HttpClientModule,
     ReactiveFormsModule,
     PrimeNgModule,
+    ChartModule,
     StoreModule.forRoot(reducers, {metaReducers})
   ],
   providers: [

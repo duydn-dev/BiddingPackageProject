@@ -36,4 +36,12 @@ namespace Neac.Common.Dtos.ProjectDtos
         public string BiddingPackageName { get; set; }
         public List<ProjectFlowExportDto> Documents { get; set; }
     }
+    public class ProjectGetStatisticalDto
+    {
+        public int? TotalProject { get; set; }
+        public int? NumberProjectNotComplete { get; set; }
+        public int? NumberProjectComplete { get; set; }
+        public double? RatioProjectNotComplete { get; set; }
+        public double? RatioProjectComplete { get; set; }
+    }
 }

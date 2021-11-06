@@ -48,10 +48,17 @@ namespace Neac.Api.Controllers
         {
             return await _projectRepository.GetByIdAsync(projectId);
         }
+        [Route("get-project-statistical")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<Response<ProjectGetStatisticalDto>> GetProjectStatisticalAsync()
+        {
+            return await _projectRepository.GetProjectStatisticalAsync();
+        }
+
         [Route("export-excel/{projectId}")]
         [HttpGet]
-        //[RoleDescription("Xuất file excel")]
-        [AllowAnonymous]
+        [RoleDescription("Xuất file excel")]
         [Obsolete]
         public async Task<ActionResult> ExportExcelAsync(Guid projectId)
         {

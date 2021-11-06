@@ -2,10 +2,23 @@
 <div class="mdl-cell mdl-cell--12-col-desktop mdl-cell--12-col-tablet mdl-cell--4-col-phone">
     <div class="mdl-card mdl-shadow--2dp line-chart">
         <div class="mdl-card__title">
-            <h2 class="mdl-card__title-text">Chào mừng</h2>
+            <h2 class="mdl-card__title-text"></h2>
         </div>
         <div class="mdl-card__supporting-text w-100">
-            Chào mừng bạn đến với hệ thống quản trị luồng dự án !
+            Biểu đồ thống kê dự án số lượng dự án theo tình trạng:
+            <div class="col-lg-12 mt-5">
+                <div class="row">
+                    <div class="col-lg-6 text-center text-white" style="border-right: 2px solid #fff">
+                        <p-chart type="doughnut" [data]="data" [options]="option" [style]="{'width': '10%'}"></p-chart>
+                        <p class="mt-3"><i>Đơn vị tính: <b>%</b></i></p>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">Tổng số dự án: <b>{{staticalData.totalProject}} Dự án</b></div>
+                        <div class="mb-3">Số dự án chưa hoàn thành: <b>{{staticalData.numberProjectNotComplete}} Dự án - ({{staticalData.ratioProjectNotComplete + "%"}})</b></div>
+                        <div>Số dự án đã hoàn thành: <b>{{staticalData.numberProjectComplete}} Dự án - ({{staticalData.ratioProjectComplete + "%"}})</b></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

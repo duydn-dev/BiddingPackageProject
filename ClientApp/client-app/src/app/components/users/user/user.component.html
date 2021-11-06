@@ -66,6 +66,23 @@
     [draggable]="false" [resizable]="false">
     <form [formGroup]="userForm">
         <div class="form-group">
+            <label class="col-lg-12">Nhóm tài khoản</label>
+            <div class="col-lg-12">
+                <p-dropdown 
+                    [options]="positions" 
+                    optionLabel="userPositionName" 
+                    optionValue="userPositionId" 
+                    formControlName="userPositionId" 
+                    placeholder="Nhóm tài khoản..."
+                    [styleClass]="'w-100'"
+                    >
+                </p-dropdown>
+                <div class="error pl-0" *ngIf="(form.userPositionId.touched || isSubmit)">
+                    <p class="text-danger" *ngIf="form.userPositionId.errors?.required">Nhóm tài khoản không thể để trống</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-lg-12">Tên tài khoản</label>
             <div class="col-lg-12">
                 <input type="text" pInputText formControlName="userName" placeholder="Tên tài khoản..." class="w-100"/>
@@ -133,23 +150,6 @@
             <div class="col-lg-12">
                 <p-fileUpload #fubauto mode="basic" name="avatar[]" [customUpload]="true" accept="image/*" maxFileSize="1000000" (onSelect)="onUploadAvatar($event)" chooseLabel="Upload"></p-fileUpload>
                 <img [src]="previewAvatar ? fullAvatarPath : '/assets/images/no-image.jpg'" class="rounded float-start mt-3" width="200" height="200" style="object-fit: cover;">
-            </div>
-        </div>
-        <div class="form-group mt-2">
-            <label class="col-lg-12">Nhóm tài khoản</label>
-            <div class="col-lg-12">
-                <p-dropdown 
-                    [options]="positions" 
-                    optionLabel="userPositionName" 
-                    optionValue="userPositionId" 
-                    formControlName="userPositionId" 
-                    placeholder="Nhóm tài khoản..."
-                    [styleClass]="'w-100'"
-                    >
-                </p-dropdown>
-                <div class="error pl-0" *ngIf="(form.userPositionId.touched || isSubmit)">
-                    <p class="text-danger" *ngIf="form.userPositionId.errors?.required">Nhóm tài khoản không thể để trống</p>
-                </div>
             </div>
         </div>
         <div class="form-group float-end pt-3 pb-3">

@@ -159,6 +159,7 @@ namespace Neac.BusinessLogic.Repository
                                           join bpp in _unitOfWork.GetRepository<BiddingPackageProject>().GetByExpression(n => n.ProjectId == projectId) on bd.BiddingPackageId equals bpp.BiddingPackageId
                                           join ds in _unitOfWork.GetRepository<DocumentSetting>().GetByExpression(n => n.ProjectId == projectId) on bpp.BiddingPackageId equals ds.BiddingPackageId into gr
                                           from grData in gr.DefaultIfEmpty()
+                                          orderby grData.Order ascending
                                           select new
                                           {
                                               BiddingPackageId = bd.BiddingPackageId,
@@ -230,6 +231,26 @@ namespace Neac.BusinessLogic.Repository
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<IEnumerable<ExportDataDto>>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<ProjectGetStatisticalDto>> GetProjectStatisticalAsync()
+        {
+            try
+            {
+                var query = _unitOfWork.GetRepository<Project>().GetAll();
+                var response = new ProjectGetStatisticalDto();
+                response.TotalProject = query.Count();
+                response.NumberProjectComplete = query.Count(n => n.CurrentState == ProjectState.Excuted);
+                response.NumberProjectNotComplete = query.Count(n => n.CurrentState == ProjectState.Excuting);
+                response.RatioProjectComplete = CommonFunction.ValidRatio(Convert.ToDouble(response.NumberProjectComplete), Convert.ToDouble(response.TotalProject));
+                response.RatioProjectNotComplete = CommonFunction.ValidRatio(Convert.ToDouble(response.NumberProjectNotComplete), Convert.ToDouble(response.TotalProject));
+                return Response<ProjectGetStatisticalDto>.CreateSuccessResponse(response);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<ProjectGetStatisticalDto>.CreateErrorResponse(ex);
             }
         }
     }
