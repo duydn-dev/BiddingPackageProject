@@ -58,7 +58,7 @@ namespace Neac.Api.Controllers
 
         [Route("export-excel/{projectId}")]
         [HttpGet]
-        [RoleDescription("Xuất file excel")]
+        [AllowAnonymous]
         [Obsolete]
         public async Task<ActionResult> ExportExcelAsync(Guid projectId)
         {
