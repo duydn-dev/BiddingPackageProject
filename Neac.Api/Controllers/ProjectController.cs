@@ -59,7 +59,6 @@ namespace Neac.Api.Controllers
         [Route("export-excel/{projectId}")]
         [HttpGet]
         [AllowAnonymous]
-        [Obsolete]
         public async Task<ActionResult> ExportExcelAsync(Guid projectId)
         {
             var licensePath = System.IO.Path.Combine(_webHostEnvironment.ContentRootPath, "Libs", "License.lic");
@@ -94,7 +93,7 @@ namespace Neac.Api.Controllers
                                 "Ghi chú",
                                 "Tình trạng"
                             });
-                            worksheet.Cells.ImportDataTable(data, true, "A1");
+                            worksheet.Cells.ImportData(data, 0, 0, new ImportTableOptions() { });
                             worksheet.AutoFitColumns();
 
                             Aspose.Cells.Range range = worksheet.Cells.CreateRange(0, 0, worksheet.Cells.Rows.Count, worksheet.Cells.Columns.Count);
