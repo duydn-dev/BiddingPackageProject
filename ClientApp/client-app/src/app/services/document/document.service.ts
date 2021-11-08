@@ -16,6 +16,9 @@ export class DocumentService {
   getDropDown(){
     return this._baseService.get("api/document/dropdown");
   }
+  getSynthetic(){
+    return this._baseService.get("api/document/get-synthetic-document");
+  }
   getDropDownByPackage(request:any){
     return this._baseService.post("api/document/dropdown-by-packageid", request);
   }

@@ -21,5 +21,6 @@ namespace Neac.BusinessLogic.Contracts
         Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync(Guid projectId);
         Task<Response<Guid>> SaveDocumentSettingAsync(Guid projectId, List<DocumentSettingCreateDto> request);
         Task<Response<List<DocumentSetting>>> GetSettingsSelectedAsync(Guid projectId);
+        Task<Response<List<Document>>> GetSyntheticDocumentAsync();
     }
 }

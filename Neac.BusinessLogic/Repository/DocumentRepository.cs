@@ -264,5 +264,19 @@ namespace Neac.BusinessLogic.Repository
                 return Response<Guid>.CreateErrorResponse(ex);
             }
         }
+
+        public async Task<Response<List<Document>>> GetSyntheticDocumentAsync()
+        {
+            try
+            {
+                var data = await _unitOfWork.GetRepository<Document>().GetByExpression(n => n.BiddingPackageId == null).ToListAsync();
+                return Response<List<Document>>.CreateSuccessResponse(data);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<List<Document>>.CreateErrorResponse(ex);
+            }
+        }
     }
 }

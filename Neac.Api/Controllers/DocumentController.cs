@@ -47,13 +47,20 @@ namespace Neac.Api.Controllers
         {
             return await _documentRepository.GetDropdownByPackageIdAsync(request);
         }
-
         [AllowAnonymous]
         [Route("get-setting-document/{projectId}")]
         [HttpGet]
         public async Task<Response<IEnumerable<PackageListByProjectDto>>> GetSettingDocumentAsync([FromRoute] Guid projectId)
         {
             return await _documentRepository.GetSettingDocumentAsync(projectId);
+        }
+
+        [RoleDescription("Lấy danh sách chọn văn bản tổng hợp")]
+        [Route("get-synthetic-document")]
+        [HttpGet]
+        public async Task<Response<List<Document>>> GetSyntheticDocumentAsync()
+        {
+            return await _documentRepository.GetSyntheticDocumentAsync();
         }
         
         [AllowAnonymous]

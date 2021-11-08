@@ -41,7 +41,7 @@ export class DocumentComponent implements OnInit {
       documentName: this._fb.control(null, [Validators.required]),
       note: this._fb.control(null),
       isCommon: this._fb.control(false),
-      biddingPackageId: this._fb.control(null, [Validators.required]),
+      biddingPackageId: this._fb.control(null),
     })
   }
   getFilter(){

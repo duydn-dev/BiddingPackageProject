@@ -28,6 +28,12 @@
                                     </div>
                                 </div>
                             </div>
+                            <button
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end mb-2"
+                                (click)="openCreateDocumentForm(null,true)">
+                                <i class="material-icons">add_circle</i>
+                                Tổng hợp
+                            </button>
                         </div>
                     </div>
                     <div class="col-lg-9">
@@ -36,7 +42,7 @@
                             <button
                                 [disabled]="isEnableCreate"
                                 class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-light-blue float-end mb-2"
-                                (click)="openCreateDocumentForm()">
+                                (click)="openCreateDocumentForm(null, false)">
                                 <i class="material-icons">add_circle</i>
                                 Thêm văn bản
                             </button>
@@ -68,7 +74,7 @@
                                     <a (click)="downloadFile(item.projectFlowId)" class="text-primary currsor-pointer">{{ getFileUrlv2(item.fileUrl) }}</a>
                                 </td>
                                 <td class="mdl-data-table__cell--non-numeric w-50px text-center">
-                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openCreateDocumentForm(item.projectFlowId)">
+                                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect button--colored-orange mr-20" (click)="openCreateDocumentForm(item.projectFlowId, false)">
                                         <i class="material-icons">create</i>
                                         Sửa
                                     </button>

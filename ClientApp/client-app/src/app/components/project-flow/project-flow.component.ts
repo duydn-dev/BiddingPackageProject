@@ -26,6 +26,7 @@ export class ProjectFlowComponent implements OnInit {
   document:any = [];
   documentImported: any = [];
   isEnableCreate:boolean = true;
+  isSynthetic:boolean = false;
   @ViewChild('inputFile') input: ElementRef;
   get form() { return this.documentForm.controls; }
 
@@ -57,7 +58,14 @@ export class ProjectFlowComponent implements OnInit {
     });
     await this.initData();
   }
-  openCreateDocumentForm(flowId:any = null){
+  async openCreateDocumentForm(flowId:any = null, isSynthetic:boolean){
+    this.isSynthetic = isSynthetic;
+    if(isSynthetic){
+      await this.getSynthetic();
+    }
+    else{
+      await this.getDropDownDocument();
+    }
     this.documentForm.clearValidators();
     this.documentForm.reset();
     this.isShowModal = true;
@@ -65,28 +73,27 @@ export class ProjectFlowComponent implements OnInit {
     this.isSubmit = false;
     this.input.nativeElement.value = null;
     if(flowId){
-      this._flowService.getFlowById(flowId).subscribe(response => {
-        if(response.success){
-          this.file = {
-            name: this.getFileUrlv2(response.responseData.fileUrl)
-          };
-          this.documentForm.patchValue({
-            projectFlowId: response.responseData.projectFlowId,
-            documentNumber: response.responseData.documentNumber,
-            projectDate: new Date(response.responseData.projectDate),
-            promulgateUnit: response.responseData.documentAbstract,
-            documentAbstract: response.responseData.documentAbstract,
-            signer: response.responseData.signer,
-            regulationDocument: response.responseData.regulationDocument,
-            note: response.responseData.note,
-            status: response.responseData.status,
-            biddingPackageId: response.responseData.biddingPackageId,
-            projectId: response.responseData.projectId,
-            documentId: response.responseData.documentId,
-            isMainDocument: response.responseData.isMainDocument,
-          });
-        }
-      })
+      const response = await this._flowService.getFlowById(flowId).toPromise();
+      if(response.success){
+        this.file = {
+          name: this.getFileUrlv2(response.responseData.fileUrl)
+        };
+        this.documentForm.patchValue({
+          projectFlowId: response.responseData.projectFlowId,
+          documentNumber: response.responseData.documentNumber,
+          projectDate: new Date(response.responseData.projectDate),
+          promulgateUnit: response.responseData.documentAbstract,
+          documentAbstract: response.responseData.documentAbstract,
+          signer: response.responseData.signer,
+          regulationDocument: response.responseData.regulationDocument,
+          note: response.responseData.note,
+          status: response.responseData.status,
+          biddingPackageId: response.responseData.biddingPackageId,
+          projectId: response.responseData.projectId,
+          documentId: response.responseData.documentId,
+          isMainDocument: response.responseData.isMainDocument,
+        });
+      }
     }
   }
   getFileUrl(url){
@@ -119,6 +126,17 @@ export class ProjectFlowComponent implements OnInit {
           return n;
         });
       }
+    }
+  }
+  async getSynthetic(){
+    const response = await this._documentService.getSynthetic().toPromise();
+    console.log(response);
+    if(response.success){
+      response.responseData.unshift({
+        documentId: null,
+        documentName: '-- Chọn văn bản --'
+      })
+      this.dropdownDocument = response.responseData;
     }
   }
   isDisabledOption(option){
@@ -232,6 +250,5 @@ export class ProjectFlowComponent implements OnInit {
   }
   async initData(){
     await this.getTotalAndCompleteDocument();
-    await this.getDropDownDocument();
   }
 }
