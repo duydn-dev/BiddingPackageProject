@@ -31,10 +31,30 @@ namespace Neac.Common.Dtos.ProjectDtos
         public string Note { get; set; }
         public string Status { get; set; }
     }
+    public class ProjectFlowExportCommonDto
+    {
+        public int Index { get; set; }
+        public string DocumentName { get; set; }
+        public string DocumentNumber { get; set; }
+        public string ProjectDate { get; set; }
+        public string PromulgateUnit { get; set; }
+        public string DocumentAbstract { get; set; }
+        public string Signer { get; set; }
+        public string RegulationDocument { get; set; }
+        public string FileUrl { get; set; }
+        public string Note { get; set; }
+        public string Status { get; set; }
+        public bool? IsMainDocument { get; set; }
+    }
     public class ExportDataDto
     {
         public string BiddingPackageName { get; set; }
-        public List<ProjectFlowExportDto> Documents { get; set; }
+        public ProjectFlowExportDto[] Documents { get; set; }
+    }
+    public class ExportDataMainDto
+    {
+        public string BiddingPackageName { get; set; }
+        public ProjectFlowExportCommonDto[] Documents { get; set; }
     }
     public class ProjectGetStatisticalDto
     {

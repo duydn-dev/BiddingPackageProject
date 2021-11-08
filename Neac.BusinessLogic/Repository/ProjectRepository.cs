@@ -149,7 +149,7 @@ namespace Neac.BusinessLogic.Repository
                 return Response<bool>.CreateErrorResponse(ex);
             }
         }
-        public async Task<Response<IEnumerable<ExportDataDto>>> GetExportDataAsync(Guid projectId)
+        public async Task<Response<IEnumerable<ExportDataMainDto>>> GetExportDataAsync(Guid projectId)
         {
             try
             {
@@ -186,7 +186,8 @@ namespace Neac.BusinessLogic.Repository
                                           Status = pf.Status,
                                           BiddingPackageId = pf.BiddingPackageId,
                                           ProjectId = pf.ProjectId,
-                                          DocumentId = pf.DocumentId
+                                          DocumentId = pf.DocumentId,
+                                          IsMainDocument = pf.IsMainDocument
                                       }).ToListAsync();
 
                 var result = (from m in mustImported
@@ -205,11 +206,12 @@ namespace Neac.BusinessLogic.Repository
                                   FileUrl = grData?.FileUrl,
                                   Note = grData?.Note,
                                   Status = grData?.Status,
-                                  DocumentId = grData?.DocumentId
-                              }).GroupBy(n => n.BiddingPackageName, (key, val) => new ExportDataDto
+                                  DocumentId = grData?.DocumentId,
+                                  IsMainDocument = grData?.IsMainDocument
+                              }).GroupBy(n => n.BiddingPackageName, (key, val) => new ExportDataMainDto
                               {
                                   BiddingPackageName = key,
-                                  Documents = val.Where(g => g.DocumentId != null).Select((g, i) => new ProjectFlowExportDto
+                                  Documents = val.Where(g => g.DocumentId != null).Select((g, i) => new ProjectFlowExportCommonDto
                                   {
                                       Index = i + 1,
                                       DocumentName = g.DocumentName,
@@ -221,16 +223,17 @@ namespace Neac.BusinessLogic.Repository
                                       RegulationDocument = g.RegulationDocument,
                                       FileUrl = host + "/" + g.FileUrl.Replace("\\", "/"),
                                       Note = g.Note,
-                                      Status = CommonFunction.DocumentStateName(g.Status)
-                                  }).ToList()
+                                      Status = CommonFunction.DocumentStateName(g.Status),
+                                      IsMainDocument = g.IsMainDocument
+                                  }).ToArray()
                               });
 
-                return Response<IEnumerable<ExportDataDto>>.CreateSuccessResponse(result);
+                return Response<IEnumerable<ExportDataMainDto>>.CreateSuccessResponse(result);
             }
             catch (Exception ex)
             {
                 await _logRepository.ErrorAsync(ex);
-                return Response<IEnumerable<ExportDataDto>>.CreateErrorResponse(ex);
+                return Response<IEnumerable<ExportDataMainDto>>.CreateErrorResponse(ex);
             }
         }
 

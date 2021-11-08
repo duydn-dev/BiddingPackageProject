@@ -33,7 +33,6 @@ export class ProjectFlowComponent implements OnInit {
     private _fb: FormBuilder,
     private route: ActivatedRoute,
     private _messageService: MessageService,
-    private _biddingService: BiddingService,
     private _documentService: DocumentService,
     private _flowService: ProjectFlowService,
     private _confirmationService: ConfirmationService,
@@ -53,7 +52,8 @@ export class ProjectFlowComponent implements OnInit {
       status: this._fb.control(null, [Validators.required]),
       biddingPackageId: this._fb.control(null),
       projectId: this._fb.control(null),
-      documentId: this._fb.control(null, [Validators.required])
+      documentId: this._fb.control(null, [Validators.required]),
+      isMainDocument: this._fb.control(false),
     });
     await this.initData();
   }
@@ -82,7 +82,8 @@ export class ProjectFlowComponent implements OnInit {
             status: response.responseData.status,
             biddingPackageId: response.responseData.biddingPackageId,
             projectId: response.responseData.projectId,
-            documentId: response.responseData.documentId
+            documentId: response.responseData.documentId,
+            isMainDocument: response.responseData.isMainDocument,
           });
         }
       })
@@ -172,11 +173,19 @@ export class ProjectFlowComponent implements OnInit {
           await this.getFlows();
         }
       }));
+      console.log(this.packages);
       this.currentPackage = response.otherData.currentPackageId;
       this.activeIndex = (response.otherData.order - 1);
       this.enableCreate();
       await this.getFlows();
     }
+  }
+  async setActiveIndex(pkg:any){
+    this.activeIndex = (pkg.order - 1);
+    this.currentPackage = pkg.biddingPackageId;
+    this.enableCreate();
+    await this.getDropDownDocument();
+    await this.getFlows();
   }
 
   async getFlows(){
@@ -222,11 +231,6 @@ export class ProjectFlowComponent implements OnInit {
     }
   }
   async initData(){
-    //await this.getCurrentPackage();
-    //await this.projectCurrentState(await this.getPackageByProjectId());
-    //await this.getFlows();
-    //await this.getDropDownDocument();
-    //this.enableCreate();
     await this.getTotalAndCompleteDocument();
     await this.getDropDownDocument();
   }

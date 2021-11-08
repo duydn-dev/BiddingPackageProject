@@ -22,6 +22,7 @@ namespace Neac.DataAccess
         public string FileUrl { get; set; }
         public string Note { get; set; }
         public int? Status { get; set; }
+        public bool? IsMainDocument { get; set; }
 
         public Guid? BiddingPackageId { get; set; }
         public Guid? ProjectId { get; set; }

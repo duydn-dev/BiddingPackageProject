@@ -27,10 +27,12 @@ namespace Neac.Api.Controllers
     {
         private readonly IProjectRepository _projectRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProjectController(IProjectRepository projectRepository, IWebHostEnvironment webHostEnvironment)
+        private readonly ILogRepository _logRepository;
+        public ProjectController(IProjectRepository projectRepository, IWebHostEnvironment webHostEnvironment, ILogRepository logRepository)
         {
             _projectRepository = projectRepository;
             _webHostEnvironment = webHostEnvironment;
+            _logRepository = logRepository;
         }
 
         [Route("")]
@@ -71,16 +73,7 @@ namespace Neac.Api.Controllers
                     lic.SetLicense(licensePath);
                     if (workbook.IsLicensed)
                     {
-                        var response = await _projectRepository.GetExportDataAsync(projectId);
-                        var responseData = response.ResponseData.ToArray();
-
-                        // draw template
-                        for (int i = 0; i < responseData.Count(); i++)
-                        {
-                            Worksheet worksheet = (i > 0) ? workbook.Worksheets[workbook.Worksheets.Add()]: workbook.Worksheets[0];
-                            worksheet.Name = responseData[i].BiddingPackageName;
-                            
-                            DataTable data = responseData[i].Documents.RenameHeaderAndConvertToDatatable(new List<string> {
+                        List<string> header = new List<string> {
                                 "STT",
                                 "Tên văn bản",
                                 "Số hiệu",
@@ -92,7 +85,77 @@ namespace Neac.Api.Controllers
                                 "Đường dẫn File",
                                 "Ghi chú",
                                 "Tình trạng"
-                            });
+                            };
+                        var response = await _projectRepository.GetExportDataAsync(projectId);
+                        var responseData = response.ResponseData.ToArray();
+                        // main data
+                        var main = responseData.SelectMany(n => n.Documents).Select(g => new ProjectFlowExportDto
+                        {
+                            DocumentAbstract = g.DocumentAbstract,
+                            DocumentName = g.DocumentName,
+                            DocumentNumber = g.DocumentNumber,
+                            FileUrl = g.FileUrl,
+                            Index = g.Index,
+                            Note = g.Note,
+                            ProjectDate = g.ProjectDate,
+                            PromulgateUnit = g.PromulgateUnit,
+                            RegulationDocument = g.RegulationDocument,
+                            Signer = g.Signer,
+                            Status = g.Status
+                        }).RenameHeaderAndConvertToDatatable(header);
+
+                        // child data
+                        var child = responseData.Select(n => new ExportDataDto
+                        {
+                            BiddingPackageName = n.BiddingPackageName,
+                            Documents = n?.Documents?.Length > 0 ? n.Documents.Select(g => new ProjectFlowExportDto
+                            {
+                                DocumentAbstract = g.DocumentAbstract,
+                                DocumentName = g.DocumentName,
+                                DocumentNumber = g.DocumentNumber,
+                                FileUrl = g.FileUrl,
+                                Index = g.Index,
+                                Note = g.Note,
+                                ProjectDate = g.ProjectDate,
+                                PromulgateUnit = g.PromulgateUnit,
+                                RegulationDocument = g.RegulationDocument,
+                                Signer = g.Signer,
+                                Status = g.Status
+                            }).ToArray() : new ProjectFlowExportDto[0]
+                        }).ToArray();
+
+                        Worksheet worksheet;
+                        worksheet = workbook.Worksheets[0];
+                        worksheet.Name = "Tổng hợp văn bản chính";
+
+                        worksheet.Cells.ImportData(main, 0, 0, new ImportTableOptions() { });
+                        worksheet.AutoFitColumns();
+
+                        Aspose.Cells.Range ranges1 = worksheet.Cells.CreateRange(0, 0, worksheet.Cells.Rows.Count, worksheet.Cells.Columns.Count);
+                        Style styles1 = workbook.CreateStyle();
+                        styles1.SetBorder(BorderType.LeftBorder, CellBorderType.Thin, Color.Black);
+                        styles1.SetBorder(BorderType.RightBorder, CellBorderType.Thin, Color.Black);
+                        styles1.SetBorder(BorderType.TopBorder, CellBorderType.Thin, Color.Black);
+                        styles1.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.Black);
+                        styles1.Font.Name = "Times New Roman";
+                        ranges1.SetStyle(styles1);
+                        if (worksheet.Cells.Rows.Count > 0)
+                        {
+                            Aspose.Cells.Range range2 = worksheet.Cells.CreateRange(0, 0, 1, worksheet.Cells.Columns.Count);
+                            Style headerStyle = workbook.CreateStyle();
+                            headerStyle.Font.IsBold = true;
+                            range2.SetStyle(headerStyle);
+                        }
+
+
+                        // draw template
+                        for (int i = 1; i <= child.Count(); i++)
+                        {
+                            worksheet = workbook.Worksheets[workbook.Worksheets.Add()];
+                            worksheet = workbook.Worksheets[i];
+                            worksheet.Name = child[i - 1].BiddingPackageName;
+
+                            DataTable data = child[i - 1].Documents.RenameHeaderAndConvertToDatatable(header);
                             worksheet.Cells.ImportData(data, 0, 0, new ImportTableOptions() { });
                             worksheet.AutoFitColumns();
 
@@ -112,6 +175,7 @@ namespace Neac.Api.Controllers
                                 range2.SetStyle(headerStyle);
                             }
                         }
+
                         MemoryStream memoryStream = new MemoryStream();
                         workbook.Save(memoryStream, SaveFormat.Xlsx);
                         var by = memoryStream.ToArray();
@@ -119,15 +183,15 @@ namespace Neac.Api.Controllers
                         memoryStream.Close();
                         return File(by, "application/octet-stream", "export-data.xlsx");
                     }
-                    return NotFound();
+                    return Content("workbook.IsLicensed = false");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
-                    return NotFound();
+                    await _logRepository.ErrorAsync(ex);
+                    return Content(ex.ToString());
                 }
             }
-            return NotFound();
+            return Content("License file not found");
         }
 
         [Route("create")]
@@ -140,7 +204,7 @@ namespace Neac.Api.Controllers
         [Route("update/{projectId}")]
         [HttpPut]
         [RoleDescription("Cập nhật dự án")]
-        public async Task<Response<ProjectGetListDto>> UpdateAsync([FromRoute]Guid projectId, ProjectGetListDto request)
+        public async Task<Response<ProjectGetListDto>> UpdateAsync([FromRoute] Guid projectId, ProjectGetListDto request)
         {
             request.ProjectId = projectId;
             return await _projectRepository.UpdateAsync(request);

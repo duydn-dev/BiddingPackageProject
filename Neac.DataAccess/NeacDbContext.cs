@@ -26,6 +26,12 @@ namespace Neac.DataAccess
         public DbSet<Document> Documents { get; set; }
         public DbSet<DocumentSetting> DocumentSettings { get; set; }
         public DbSet<ProjectFlow> ProjectFlows { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProjectFlow>()
+                .Property(b => b.IsMainDocument)
+                .HasDefaultValue(false);
+        }
     }
     public class NeacDbContextFactory : IDesignTimeDbContextFactory<NeacDbContext>
     {
