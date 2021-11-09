@@ -60,7 +60,7 @@ export class ProjectFlowComponent implements OnInit {
     await this.initData();
   }
   async openCreateDocumentForm(flow:any, isSynthetic:boolean){
-    const flowId:any = (flow) ? flow.flowId: null;
+    const flowId:any = (flow) ? flow.projectFlowId: null;
     this.isSynthetic = isSynthetic;
     this.currentPackage = flow ? flow.biddingPackageId: this.currentPackage;
     if(isSynthetic){
