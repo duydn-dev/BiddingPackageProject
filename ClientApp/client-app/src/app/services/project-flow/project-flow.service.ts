@@ -28,6 +28,9 @@ export class ProjectFlowService {
     formData.append('projectFlow', JSON.stringify(metadata));
     return this._baseService.uploadFile('api/projectflow/update', formData);
   }
+  getFlowSynthetic(projectId: any){
+    return this._baseService.get('api/projectflow/get-flow-synthetic', projectId);
+  }
   projectCurrentState(projectId: any){
     return this._baseService.get('api/projectflow/current-state', projectId);
   }

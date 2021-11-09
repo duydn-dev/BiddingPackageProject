@@ -28,7 +28,7 @@
                     <th class="mdl-data-table__cell--non-numeric">Tên dự án</th>
                     <th class="mdl-data-table__cell--non-numeric">Ngày tạo</th>
                     <th class="mdl-data-table__cell--non-numeric">Ghi chú</th>
-                    <th class="mdl-data-table__cell--non-numeric">Trạng thái hiện tại</th>
+                    <!-- <th class="mdl-data-table__cell--non-numeric">Trạng thái hiện tại</th> -->
                     <th class="mdl-data-table__cell--non-numeric w-50px">Thao tác</th>
                 </tr>
                 </thead>
@@ -38,8 +38,8 @@
                     <td class="mdl-data-table__cell--non-numeric">{{item.projectName}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.projectDate | date: "dd/MM/yyyy"}}</td>
                     <td class="mdl-data-table__cell--non-numeric">{{item.note}}</td>
-                    <td class="mdl-data-table__cell--non-numeric" *ngIf="item.currentState == 0">Chưa hoàn thành</td>
-                    <td class="mdl-data-table__cell--non-numeric" *ngIf="item.currentState == 1">Đã hoàn thành</td>
+                    <!-- <td class="mdl-data-table__cell--non-numeric" *ngIf="item.currentState == 0">Chưa hoàn thành</td>
+                    <td class="mdl-data-table__cell--non-numeric" *ngIf="item.currentState == 1">Đã hoàn thành</td> -->
                     <td class="mdl-data-table__cell--non-numeric w-50px text-center">
                         <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--raised mdl-js-ripple-effect button--colored-green mr-20" title="Cấu hình văn bản" [routerLink]="'/document-setting/' + item.projectId">
                             <i class="material-icons">build_circle</i>

@@ -21,5 +21,6 @@ namespace Neac.BusinessLogic.Contracts
         Task<Response<Guid>> CurrentPackageAsync(Guid projectId);
         Task<string> UploadFile(IFormFile file);
         Task<string> DownloadAsync(Guid projectFlowId);
+        Task<Response<List<ProjectFlowGetListDto>>> GetFlowSyntheticAsync(Guid projectFlowId);
     }
 }

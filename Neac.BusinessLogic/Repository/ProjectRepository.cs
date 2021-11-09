@@ -165,8 +165,10 @@ namespace Neac.BusinessLogic.Repository
                                               BiddingPackageId = bd.BiddingPackageId,
                                               BiddingPackageName = bd.BiddingPackageName,
                                               DocumentId = grData.DocumentId,
-                                              Order = grData.Order
+                                              Order = bpp.Order
                                           }).ToListAsync();
+
+                mustImported = mustImported.OrderBy(n => n.Order).ToList();
 
                 var imported = await (from pf in _unitOfWork.GetRepository<ProjectFlow>().GetAll()
                                       join d in _unitOfWork.GetRepository<Document>().GetAll() on pf.DocumentId equals d.DocumentId

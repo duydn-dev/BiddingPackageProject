@@ -24,6 +24,7 @@ export class ProjectFlowComponent implements OnInit {
   dropdownDocument:any = [];
   file:any = null;
   document:any = [];
+  flowSythentic:any = [];
   documentImported: any = [];
   isEnableCreate:boolean = true;
   isSynthetic:boolean = false;
@@ -58,8 +59,10 @@ export class ProjectFlowComponent implements OnInit {
     });
     await this.initData();
   }
-  async openCreateDocumentForm(flowId:any = null, isSynthetic:boolean){
+  async openCreateDocumentForm(flow:any, isSynthetic:boolean){
+    const flowId:any = (flow) ? flow.flowId: null;
     this.isSynthetic = isSynthetic;
+    this.currentPackage = flow ? flow.biddingPackageId: this.currentPackage;
     if(isSynthetic){
       await this.getSynthetic();
     }
@@ -68,13 +71,13 @@ export class ProjectFlowComponent implements OnInit {
     }
     this.documentForm.clearValidators();
     this.documentForm.reset();
-    this.isShowModal = true;
-    this.file = null;
-    this.isSubmit = false;
-    this.input.nativeElement.value = null;
     if(flowId){
       const response = await this._flowService.getFlowById(flowId).toPromise();
       if(response.success){
+        this.isShowModal = true;
+        this.file = null;
+        this.isSubmit = false;
+        this.input.nativeElement.value = null;
         this.file = {
           name: this.getFileUrlv2(response.responseData.fileUrl)
         };
@@ -94,6 +97,12 @@ export class ProjectFlowComponent implements OnInit {
           isMainDocument: response.responseData.isMainDocument,
         });
       }
+    }
+    else{
+      this.isShowModal = true;
+      this.file = null;
+      this.isSubmit = false;
+      this.input.nativeElement.value = null;
     }
   }
   getFileUrl(url){
@@ -130,7 +139,6 @@ export class ProjectFlowComponent implements OnInit {
   }
   async getSynthetic(){
     const response = await this._documentService.getSynthetic().toPromise();
-    console.log(response);
     if(response.success){
       response.responseData.unshift({
         documentId: null,
@@ -174,6 +182,10 @@ export class ProjectFlowComponent implements OnInit {
     const flow = this.packages.find(n => n.biddingPackageId == this.currentPackage);
     this.isEnableCreate = ((flow.currentDocumentCount == flow.documentCount) && (flow.documentCount == 0))
   }
+  async getFlowSynthetic(){
+    const response = await this._flowService.getFlowSynthetic(this.projectId).toPromise();
+    this.flowSythentic = response.responseData;
+  }
   async getTotalAndCompleteDocument(){
     const response = await this._flowService.projectCurrentState(this.projectId).toPromise();
     if (response.success) {
@@ -191,7 +203,6 @@ export class ProjectFlowComponent implements OnInit {
           await this.getFlows();
         }
       }));
-      console.log(this.packages);
       this.currentPackage = response.otherData.currentPackageId;
       this.activeIndex = (response.otherData.order - 1);
       this.enableCreate();
@@ -221,7 +232,7 @@ export class ProjectFlowComponent implements OnInit {
     }
     const request = this.documentForm.value;
     request.projectId = this.projectId;
-    request.biddingPackageId = this.currentPackage;
+    request.biddingPackageId = this.isSynthetic ? null: this.currentPackage;
 
     if(this.documentForm.get('projectFlowId').value){
       const response = await this._flowService.updateFlow(this.file, request).toPromise();
@@ -250,5 +261,6 @@ export class ProjectFlowComponent implements OnInit {
   }
   async initData(){
     await this.getTotalAndCompleteDocument();
+    await this.getFlowSynthetic();
   }
 }

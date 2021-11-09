@@ -26,13 +26,15 @@ namespace Neac.Api.Controllers
     public class ProjectController : ControllerBase
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly IProjectFlowRepository _projectFlowRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogRepository _logRepository;
-        public ProjectController(IProjectRepository projectRepository, IWebHostEnvironment webHostEnvironment, ILogRepository logRepository)
+        public ProjectController(IProjectRepository projectRepository, IWebHostEnvironment webHostEnvironment, ILogRepository logRepository, IProjectFlowRepository projectFlowRepository)
         {
             _projectRepository = projectRepository;
             _webHostEnvironment = webHostEnvironment;
             _logRepository = logRepository;
+            _projectFlowRepository = projectFlowRepository;
         }
 
         [Route("")]
@@ -86,25 +88,28 @@ namespace Neac.Api.Controllers
                                 "Ghi chú",
                                 "Tình trạng"
                             };
-                        var response = await _projectRepository.GetExportDataAsync(projectId);
-                        var responseData = response.ResponseData.ToArray();
-                        // main data
-                        var main = responseData.SelectMany(n => n.Documents).Select(g => new ProjectFlowExportDto
+
+                        // tổng hợp
+                        var synthetic = await _projectFlowRepository.GetFlowSyntheticAsync(projectId);
+                        var listSynthetic = synthetic.ResponseData.Select((g, i) => new ProjectFlowExportDto 
                         {
                             DocumentAbstract = g.DocumentAbstract,
                             DocumentName = g.DocumentName,
                             DocumentNumber = g.DocumentNumber,
                             FileUrl = g.FileUrl,
-                            Index = g.Index,
+                            Index = (i + 1),
                             Note = g.Note,
-                            ProjectDate = g.ProjectDate,
+                            ProjectDate = g.ProjectDate.Value.ToString("dd/MM/yyyy"),
                             PromulgateUnit = g.PromulgateUnit,
                             RegulationDocument = g.RegulationDocument,
                             Signer = g.Signer,
-                            Status = g.Status
+                            Status = CommonFunction.DocumentStateName(g.Status),
                         }).RenameHeaderAndConvertToDatatable(header);
 
-                        // child data
+                        var response = await _projectRepository.GetExportDataAsync(projectId);
+                        var responseData = response.ResponseData.ToArray();
+
+                        // văn bản theo gói thầu
                         var child = responseData.Select(n => new ExportDataDto
                         {
                             BiddingPackageName = n.BiddingPackageName,
@@ -128,7 +133,7 @@ namespace Neac.Api.Controllers
                         worksheet = workbook.Worksheets[0];
                         worksheet.Name = "Tổng hợp văn bản chính";
 
-                        worksheet.Cells.ImportData(main, 0, 0, new ImportTableOptions() { });
+                        worksheet.Cells.ImportData(listSynthetic, 0, 0, new ImportTableOptions() { });
                         worksheet.AutoFitColumns();
 
                         Aspose.Cells.Range ranges1 = worksheet.Cells.CreateRange(0, 0, worksheet.Cells.Rows.Count, worksheet.Cells.Columns.Count);

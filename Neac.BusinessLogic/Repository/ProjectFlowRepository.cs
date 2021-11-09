@@ -41,13 +41,13 @@ namespace Neac.BusinessLogic.Repository
             {
                 // kiểm tra gói thầu hiện tại đã đủ văn bản chưa
                 var projectFlow = JsonConvert.DeserializeObject<ProjectFlowCreateDto>(_httpContextAccessor.HttpContext.Request.Form["projectFlow"].ToString());
-                var countData = await CurrentState(projectFlow.ProjectId.Value);
-                var currentPackageCount = countData.ResponseData.FirstOrDefault(n => n.BiddingPackageId == projectFlow.BiddingPackageId);
-                if(currentPackageCount?.CurrentDocumentCount >= currentPackageCount?.DocumentCount)
-                {
-                    await _logRepository.ErrorAsync("Gói thầu đã đủ văn bản !");
-                    return Response<ProjectFlow>.CreateErrorResponse(new Exception("Gói thầu đã đủ văn bản !"));
-                }
+                //var countData = await CurrentState(projectFlow.ProjectId.Value);
+                //var currentPackageCount = countData.ResponseData.FirstOrDefault(n => n.BiddingPackageId == projectFlow.BiddingPackageId);
+                //if(currentPackageCount?.CurrentDocumentCount >= currentPackageCount?.DocumentCount)
+                //{
+                //    await _logRepository.ErrorAsync("Gói thầu đã đủ văn bản !");
+                //    return Response<ProjectFlow>.CreateErrorResponse(new Exception("Gói thầu đã đủ văn bản !"));
+                //}
 
                 if (_httpContextAccessor.HttpContext.Request.Form.Files?.Count > 0)
                 {
@@ -61,19 +61,19 @@ namespace Neac.BusinessLogic.Repository
                 }
 
                 // tìm kiếm package chưa set văn bản 
-                var isUnsetDocument = countData.ResponseData.Count(n => n.DocumentCount == 0);
-                if(isUnsetDocument <= 0)
-                {
-                    // nếu không có thì so sánh tổng đã nhập + 1 và tổng phải nhập văn bản của project hiện tại
-                    var totalDocument = countData.ResponseData.Select(n => n.DocumentCount).Sum();
-                    var totalImported = countData.ResponseData.Select(n => n.CurrentDocumentCount).Sum() + 1;
-                    if(totalDocument == totalImported)
-                    {
-                        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
-                        projectInfo.CurrentState = ProjectState.Excuted;
-                        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
-                    }
-                }
+                //var isUnsetDocument = countData.ResponseData.Count(n => n.DocumentCount == 0);
+                //if(isUnsetDocument <= 0)
+                //{
+                //    // nếu không có thì so sánh tổng đã nhập + 1 và tổng phải nhập văn bản của project hiện tại
+                //    var totalDocument = countData.ResponseData.Select(n => n.DocumentCount).Sum();
+                //    var totalImported = countData.ResponseData.Select(n => n.CurrentDocumentCount).Sum() + 1;
+                //    if(totalDocument == totalImported)
+                //    {
+                //        var projectInfo = await _unitOfWork.GetRepository<Project>().GetByExpression(n => n.ProjectId == projectFlow.ProjectId).FirstOrDefaultAsync();
+                //        projectInfo.CurrentState = ProjectState.Excuted;
+                //        await _unitOfWork.GetRepository<Project>().Update(projectInfo);
+                //    }
+                //}
 
                 projectFlow.ProjectFlowId = Guid.NewGuid();
                 projectFlow.ProjectDate = projectFlow.ProjectDate.Value.AddDays(1);
@@ -354,6 +354,41 @@ namespace Neac.BusinessLogic.Repository
             {
                 await _logRepository.ErrorAsync(ex);
                 return Response<bool>.CreateErrorResponse(ex);
+            }
+        }
+
+        public async Task<Response<List<ProjectFlowGetListDto>>> GetFlowSyntheticAsync(Guid projectId)
+        {
+            try
+            {
+                var joined = await (from pl in _unitOfWork.GetRepository<ProjectFlow>().GetAll()
+                                    join d in _unitOfWork.GetRepository<Document>().GetAll() on pl.DocumentId equals d.DocumentId
+                                    where pl.ProjectId == projectId && pl.IsMainDocument.Value
+                                    orderby pl.ProjectDate ascending
+                                    select new ProjectFlowGetListDto
+                                    {
+                                        BiddingPackageId = pl.BiddingPackageId,
+                                        ProjectId = pl.ProjectId,
+                                        DocumentId = pl.DocumentId,
+                                        DocumentAbstract = pl.DocumentAbstract,
+                                        DocumentName = d.DocumentName,
+                                        DocumentNumber = pl.DocumentNumber,
+                                        FileUrl = pl.FileUrl,
+                                        Note = pl.Note,
+                                        ProjectDate = pl.ProjectDate,
+                                        ProjectFlowId = pl.ProjectFlowId,
+                                        PromulgateUnit = pl.PromulgateUnit,
+                                        RegulationDocument = pl.RegulationDocument,
+                                        Signer = pl.Signer,
+                                        Status = pl.Status,
+                                        IsMainDocument = pl.IsMainDocument
+                                    }).ToListAsync();
+                return Response<List<ProjectFlowGetListDto>>.CreateSuccessResponse(joined);
+            }
+            catch(Exception ex)
+            {
+                await _logRepository.ErrorAsync(ex);
+                return Response<List<ProjectFlowGetListDto>>.CreateErrorResponse(ex);
             }
         }
     }

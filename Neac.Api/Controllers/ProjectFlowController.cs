@@ -71,6 +71,15 @@ namespace Neac.Api.Controllers
         {
             return await _projectFlowRepository.UpdateAsync();
         }
+
+        [Route("get-flow-synthetic/{projectId}")]
+        [HttpGet]
+        [RoleDescription("Xem danh sách tổng hợp đã nhập")]
+        public async Task<Response<List<ProjectFlowGetListDto>>> GetFlowSyntheticAsync([FromRoute] Guid projectId)
+        {
+            return await _projectFlowRepository.GetFlowSyntheticAsync(projectId);
+        }
+
         [Route("delete/{projectFlowId}")]
         [HttpDelete]
         [RoleDescription("Xóa văn bản trong luồng dự án")]
